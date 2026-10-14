@@ -7,7 +7,7 @@ const DotMatrixPalettes = [
 /** Global lattice; area averaging removes texture and attenuates narrow structures.
  * No random sampling, binary luminance threshold, or per-cell grid restart.
  */
-export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, profile = null, colors = null) {
+export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, profile = null, colors = null, phase = null) {
   const step = Math.max(4, spacing);
   const stride = width + 1;
   const integral = new Float64Array(stride * (height + 1));
@@ -57,6 +57,7 @@ export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, 
   // Minimum span avoids amplifying noise in almost uniform/dark images.
   const white=profile?.white ?? Math.max(black+.18,high+(high-low)*.10);
   canvas.dotMatrixProfile={black,white};
+  const dots = [];
   for (let y = step/2; y < height; y += step) for (let x = step/2; x < width; x += step) {
     // Keep a smaller sampling footprint for narrow stems instead of averaging
     // their signal away with the surrounding black background.
@@ -77,8 +78,49 @@ export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, 
     const structure = .65 + .35*broad*broad*(3-2*broad);
     const radius = step * .40 * Math.pow(tone, .70) * structure;
     if (radius === 0) continue;
-    if(stops.length) ctx.fillStyle=colorAt(((x/width+y/height)/2-colorMin)/Math.max(.01,colorMax-colorMin));
-    ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI*2); ctx.fill();
+    dots.push({x,y,radius,position:Math.max(0,Math.min(1,((x/width+y/height)/2-colorMin)/Math.max(.01,colorMax-colorMin)))});
   }
+  const bounds=dots.reduce((b,d)=>({left:Math.min(b.left,d.x),right:Math.max(b.right,d.x),top:Math.min(b.top,d.y),bottom:Math.max(b.bottom,d.y)}),{left:width,right:0,top:height,bottom:0});
+  const span=Math.max(1,bounds.right-bounds.left,bounds.bottom-bounds.top);
+  const centerX=(bounds.left+bounds.right)/2,centerY=(bounds.top+bounds.bottom)/2;
+  // Broad, deforming mesh-gradient regions, inspired by the flowing video reference.
+  // Geometry is prepared once. Animation repaints colours only.
+  canvas.repaintGradient = (phase = null) => {
+    ctx.fillStyle='#000000';ctx.fillRect(0,0,width,height);
+    const angle=(phase===null?0:phase%1)*Math.PI*2;
+    const anchors=[[.12,.05,0],[.88,.15,3],[.46,.60,1],[.05,1.02,2],[1.02,.94,0]];
+    const pools=phase===null||!stops.length?[]:anchors.map(([x,y,index],i)=>{
+      const seed=i*1.71;
+      return {
+        x:x+.16*Math.sin(angle+seed)+.055*Math.sin(2*angle-seed),
+        y:y+.19*Math.sin(angle+seed+1.2),
+        sx:.27+.055*Math.sin(angle+seed+.8),
+        sy:.31+.07*Math.cos(angle+seed),
+        color:stops[index%stops.length]
+      };
+    });
+    for(const {x,y,radius,position} of dots){
+      let color=stops.length?colorAt(position):'#FFFFFF';
+      if(pools.length){
+        const u=(x-centerX)/span+.5,v=(y-centerY)/span+.5;
+        // A shared low-frequency flow stretches the regions into soft irregular
+        // shapes rather than moving recognisable circular blobs around the canvas.
+        const warpedU=u+.15*Math.sin(v*4.2+angle)+.07*Math.cos(u*3.1-v*2.4-angle);
+        const warpedV=v+.14*Math.sin(u*3.8-angle+.9)+.06*Math.sin(v*3+u*2+angle);
+        let weight=0;const rgb=[0,0,0];
+        for(const pool of pools){
+          const d=((warpedU-pool.x)/pool.sx)**2+((warpedV-pool.y)/pool.sy)**2;
+          const w=Math.exp(-d*1.25);
+          weight+=w;
+          for(let channel=0;channel<3;channel++)rgb[channel]+=pool.color[channel]*w;
+        }
+        color=`rgb(${rgb.map(value=>Math.round(value/Math.max(1e-12,weight))).join(',')})`;
+      }
+      ctx.fillStyle=color;
+      ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill();
+    }
+    return canvas;
+  };
+  canvas.repaintGradient(phase);
   return canvas;
 }
