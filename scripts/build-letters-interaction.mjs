@@ -20,7 +20,7 @@ for(const name of ['assets/index-BwYdjEfo.js','Grid Studio.html']){
 
  }
  if(!s.includes('Взаимодействие с буквами')){
- patch('P==="letters"&&U.jsxs("div",{className:"dot-palette-control",children:[', 'P==="letters"&&U.jsxs("div",{className:"dot-palette-control",children:[U.jsxs("label",{style:{display:"flex",gap:8,alignItems:"center",marginBottom:12},children:[U.jsx("input",{type:"checkbox",checked:lettersInteractive,onChange:e=>setLettersInteractive(e.target.checked)}),"Взаимодействие с буквами"]}),U.jsx("p",{style:{fontSize:12,lineHeight:1.5,opacity:.65,marginBottom:16},children:"Проведите по тексту курсором или пальцем. Нажмите, чтобы усилить движение."}),lettersInteractive&&Ge("Радиус",lettersRadius,30,200,setLettersRadius," px"),lettersInteractive&&Ge("Сила",lettersStrength,0,100,setLettersStrength,"%"),');
+ patch('P==="letters"&&U.jsxs("div",{className:"dot-palette-control",children:[', 'P==="letters"&&U.jsxs("div",{className:"dot-palette-control",children:[U.jsxs("label",{style:{display:"flex",gap:8,alignItems:"center",marginBottom:12},children:[U.jsx("input",{type:"checkbox",checked:lettersInteractive,onChange:e=>setLettersInteractive(e.target.checked)}),"Взаимодействие с буквами"]}),lettersInteractive&&Ge("Радиус",lettersRadius,30,200,setLettersRadius," px"),lettersInteractive&&Ge("Сила",lettersStrength,0,100,setLettersStrength,"%"),');
  }
  s=s.replace('lettersStrength,su,performance.now());','lettersStrength,su,performance.now(),v);');
  await fs.writeFile(new URL(name,root),s);

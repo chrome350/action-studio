@@ -76,3 +76,15 @@ await import('./build-transitions.mjs');
 await import('./build-letters-interaction.mjs');
 
 await import('./build-video.mjs');
+
+await import('./build-video-performance.mjs');
+await import('./build-adaptive-tone.mjs');
+await import('./build-video-cycle.mjs');
+
+await import('./build-video-effects.mjs');
+
+await import('./build-gradient-picker.mjs');
+
+await import('./build-watermark.mjs');
+
+await import('./build-checkboxes.mjs');

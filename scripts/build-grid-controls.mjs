@@ -14,8 +14,8 @@ const rules = `/* grid-controls:start */
 #grid-settings .summary{margin-top:0;margin-bottom:12px}
 #grid-settings .color-row{margin:12px 0}
 .studio-slider-thumb{width:20px;height:14px}
-.slider-glass-body{transform:translate(-50%,-50%)scale(.46)}
-.glass-slider-shell[data-pressed=true] .slider-glass-body{transform:translate(-50%,-50%)scale(.72)}
+.slider-glass-body{transform:translate(-50%,-50%)scale(.414)}
+.glass-slider-shell[data-pressed=true] .slider-glass-body{transform:translate(-50%,-50%)scale(.648)}
 .control-label{margin-bottom:0}
 .studio-slider,.glass-slider-shell{height:30px}
 @media(max-width:960px){.control{margin-top:12px}.studio-slider,.glass-slider-shell{height:34px}}

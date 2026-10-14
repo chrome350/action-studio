@@ -26,6 +26,7 @@ for(const name of ['assets/index-BwYdjEfo.js','Grid Studio.html']) {
  s=s.replace('[lettersPalette,setLettersPalette]=O.useState("linked"),[lettersCustom,setLettersCustom]=O.useState("#34A4FA"),lettersColors=lettersPalette==="linked"?dotColors:lettersPalette==="custom"?[lettersCustom]:','[lettersPalette,setLettersPalette]=O.useState("confa"),lettersColors=')
  .replace('lettersPalette,lettersCustom]','lettersPalette]')
  .replace('setLettersPalette("linked"),setLettersCustom("#34A4FA"),','setLettersPalette("confa"),');
+ s=s.replace(/(Ih=\{[^}]*letters:)\d+/,(_,prefix)=>prefix+"6");
  await fs.writeFile(file,s);
 }
 console.log('Letters colour palettes updated in web and offline builds.');

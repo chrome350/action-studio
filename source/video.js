@@ -30,6 +30,12 @@ function useGridVideo(url,kind,source,freeze,setFreeze,canvas,logo,overlay,logoX
     const update=()=>{if(!disposed)setStatus({ready:media.readyState>=2,time:media.currentTime||0,duration:Number.isFinite(media.duration)?media.duration:0,playing:!media.paused,error:''})};
     const fail=()=>{if(!disposed){setStatus(old=>({...old,ready:false,playing:false,error:kind==='video'?'Не удалось открыть видео. Попробуйте MP4 (H.264) или WebM.':'Не удалось открыть изображение.'}));recordingRef.current?.cancel();}};
     media.addEventListener('error',fail);
+    const visibility=()=>{
+      if(kind!=='video'||recordingRef.current)return;
+      if(document.hidden){media.gridResumeOnVisible=!media.paused;media.pause()}
+      else if(media.gridResumeOnVisible&&!freeze.current){media.gridResumeOnVisible=false;media.play().catch(()=>{})}
+    };
+    document.addEventListener('visibilitychange',visibility);
     if(kind==='video'){
       media.muted=true;media.playsInline=true;media.preload='auto';media.loop=true;
       Object.defineProperties(media,{naturalWidth:{get:()=>media.videoWidth},naturalHeight:{get:()=>media.videoHeight},complete:{get:()=>media.readyState>=2&&!media.seeking}});
@@ -38,7 +44,7 @@ function useGridVideo(url,kind,source,freeze,setFreeze,canvas,logo,overlay,logoX
     }
     media.src=url;
     return ()=>{
-      disposed=true;generation.current=token+1;recordingRef.current?.cancel();
+      disposed=true;document.removeEventListener('visibilitychange',visibility);generation.current=token+1;recordingRef.current?.cancel();
       if(kind==='video'){media.pause();media.removeAttribute('src');media.load();}
       if(source.current===media)source.current=null;
       if(audioRef.current){audioRef.current.context.close().catch(()=>{});audioRef.current=null;}
@@ -50,11 +56,16 @@ function useGridVideo(url,kind,source,freeze,setFreeze,canvas,logo,overlay,logoX
   function toggle(){
     if(recordingRef.current)return;
     const media=source.current;if(kind!=='video'||!media)return;
-    if(!media.paused){media.pause();setPaused(true)}else{setPaused(false);media.play().catch(()=>setRecordError('Не удалось запустить видео.'))}
+    if(!media.paused){media.pause();media.gridNeedsFullFrame=true;media.gridFullFrame=true;setPaused(true)}else{media.gridFullFrame=false;setPaused(false);media.play().catch(()=>setRecordError('Не удалось запустить видео.'))}
   }
   function seek(value){
     const media=source.current;if(kind!=='video'||!media||recordingRef.current)return;
-    media.pause();setPaused(false);media.currentTime=Math.max(0,Math.min(status.duration,value));
+    media.pause();media.gridFullFrame=true;media.gridNeedsFullFrame=true;setPaused(false);media.currentTime=Math.max(0,Math.min(status.duration,value));
+  }
+  async function ensureFullFrame(){
+    const media=source.current;if(kind!=='video'||!media)return true;
+    media.pause();media.gridFullFrame=true;setPaused(true);
+    try{await gridWaitForFullFrame(media);return true}catch(error){setRecordError(error.message);return false}
   }
   async function record(){
     const media=source.current,mime=videoMime();
@@ -62,21 +73,21 @@ function useGridVideo(url,kind,source,freeze,setFreeze,canvas,logo,overlay,logoX
     if(!mime||!canvas.current?.captureStream){setRecordError('Запись видео недоступна в этом браузере. Откройте редактор в Chrome или Safari.');return;}
     const token=generation.current;let stream=null,recorder=null,raf=0,cancelled=false,finished=false;
     const oldLoop=media.loop;let audioTrack=null;
-    function cleanup(){cancelAnimationFrame(raf);media.removeEventListener('ended',ended);stream?.getTracks().forEach(track=>track.stop());media.loop=oldLoop;media.muted=true;if(source.current===media){media.pause();setPaused(true)}if(recordingRef.current===controller)recordingRef.current=null;if(token===generation.current)setRecording(false)}
+    function cleanup(){cancelAnimationFrame(raf);media.removeEventListener('ended',ended);stream?.getTracks().forEach(track=>track.stop());media.loop=oldLoop;media.muted=true;media.gridExporting=false;media.gridFullFrame=true;if(source.current===media){media.pause();setPaused(true)}if(recordingRef.current===controller)recordingRef.current=null;if(token===generation.current)setRecording(false)}
     function stop(){if(recorder&&recorder.state!=='inactive')recorder.stop();else if(!finished){cancelled=true;finished=true;cleanup()}}
     function ended(){// Allow the render loop to paint the final decoded frame.
       requestAnimationFrame(()=>requestAnimationFrame(()=>{paint();stop()}));
     }
     const controller={stop,cancel(){cancelled=true;stop()}};recordingRef.current=controller;
-    setRecording(true);setRecordError('');clearResult();
-    const output=document.createElement('canvas');output.width=output.height=1080;const ctx=output.getContext('2d');
+    media.gridExporting=true;media.gridNeedsFullFrame=true;setRecording(true);setRecordError('');clearResult();
+    const output=document.createElement('canvas');output.width=output.height=1080;const ctx=output.getContext('2d');let paintedVersion=-1;
     function paint(){
-      if(!canvas.current)return;
+      if(!canvas.current||paintedVersion===media.gridRenderVersion)return;paintedVersion=media.gridRenderVersion;
       ctx.drawImage(canvas.current,0,0,1080,1080);
       if(overlay.current&&getComputedStyle(overlay.current).visibility!=='hidden'){
         ctx.globalAlpha=Number(getComputedStyle(overlay.current).opacity);ctx.drawImage(overlay.current,0,0,1080,1080);ctx.globalAlpha=1;
       }
-      const mark=logo.current;if(mark?.complete&&mark.naturalWidth){const scale=1080/600;ctx.drawImage(mark,logoX*scale,logoX*scale,logoHeight*scale*mark.naturalWidth/mark.naturalHeight,logoHeight*scale)}
+
     }
     try{
       // Create/resume the audio graph during the click gesture. Preview remains muted.
@@ -94,7 +105,7 @@ function useGridVideo(url,kind,source,freeze,setFreeze,canvas,logo,overlay,logoX
       media.pause();media.loop=false;setPaused(false);
       if(media.currentTime!==0)await waitVideoEvent(media,'seeked',()=>{media.currentTime=0});
       if(cancelled||token!==generation.current)return;
-      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+      await gridWaitForFullFrame(media);
       if(logo.current&&!logo.current.complete)await logo.current.decode();
       if(cancelled||token!==generation.current)return;
       paint();stream=output.captureStream(30);if(audioTrack)stream.addTrack(audioTrack);
@@ -115,16 +126,16 @@ function useGridVideo(url,kind,source,freeze,setFreeze,canvas,logo,overlay,logoX
     }catch(error){cancelled=true;if(token===generation.current)setRecordError(error.message||'Не удалось записать видео.');stop();}
     finally{if(cancelled){controller.disconnect?.();audioTrack?.stop();if(!finished&&(!recorder||recorder.state==='inactive')){finished=true;cleanup()}}}
   }
-  return {kind,status,recording,recordError,result,toggle,seek,record,isRecording:()=>!!recordingRef.current,stop:()=>recordingRef.current?.stop()};
+  return {kind,status,recording,recordError,result,toggle,seek,record,ensureFullFrame,isRecording:()=>!!recordingRef.current,stop:()=>recordingRef.current?.stop()};
 }
 function GridVideoControls({video}) {
   const {status,recording}=video;
   if(video.kind!=='video')return status.error?U.jsx('p',{role:'alert',children:status.error}):null;
   return U.jsxs('div',{className:'video-controls',children:[
-    U.jsxs('div',{className:'video-transport',children:[U.jsx('button',{type:'button',disabled:!status.ready||recording,onClick:video.toggle,children:status.playing?'Пауза видео':'Воспроизвести'}),U.jsx('span',{'aria-live':'off',children:`${videoTime(status.time)} / ${videoTime(status.duration)}`})]}),
-    U.jsx('input',{type:'range',min:0,max:status.duration||1,step:.01,value:Math.min(status.time,status.duration||1),disabled:!status.ready||recording,'aria-label':'Позиция видео',onChange:e=>video.seek(Number(e.target.value))}),
-    U.jsx('p',{children:recording?'Идёт запись. Дождитесь конца ролика или сохраните текущий фрагмент.':'Предпросмотр без звука. Экспорт — со звуком, с начала ролика, в реальном времени.'}),
-    U.jsx('button',{type:'button',disabled:!status.ready&&!recording,onClick:recording?video.stop:video.record,children:recording?'Завершить и сохранить':'Экспорт видео'}),
+    U.jsxs('div',{className:'video-timeline',children:[
+      U.jsx('input',{type:'range',min:0,max:status.duration||1,step:.01,value:Math.min(status.time,status.duration||1),disabled:!status.ready||recording,'aria-label':'Позиция видео',onChange:e=>video.seek(Number(e.target.value))}),
+      U.jsx('span',{'aria-live':'off',children:`${videoTime(status.time)} / ${videoTime(status.duration)}`})
+    ]}),
     !status.ready&&!status.error&&U.jsx('p',{role:'status',children:'Загрузка видео…'}),
     (status.error||video.recordError)&&U.jsx('p',{role:'alert',children:status.error||video.recordError}),
     video.result&&U.jsx('a',{href:video.result.href,download:video.result.name,children:'Скачать готовое видео'})

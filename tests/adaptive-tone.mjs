@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {gridAdaptiveTone,gridLettersMask} from '../source/adaptive-tone.js';
+import {lettersColorField} from '../source/letters-color.js';
+const frame=(rgb)=>{const d=new Uint8ClampedArray(64*64*4);for(let i=0;i<d.length;i+=4)d.set([...rgb,255],i);return d};
+const dark=frame([12,25,65]),p=gridAdaptiveTone(dark),mask=gridLettersMask(dark,p);
+assert.ok(mask[3]>200,'dark blue object is readable');
+const black=frame([0,0,0]);assert.equal(gridLettersMask(black,p)[3],0,'black background stays empty');
+assert.equal(gridLettersMask(frame([1,1,1]),gridAdaptiveTone(frame([1,1,1])))[3],0,'near-black noise stays empty');
+const field=lettersColorField(dark,64,64,['#FFFFFF'],p);assert.ok(parseInt(field(32,32,.12).slice(4))>180,'dark glyphs lifted');
+const media={tagName:'VIDEO'};
+const before=gridAdaptiveTone(dark,media,0),next=gridAdaptiveTone(frame([230,230,230]),media,.033),target=gridAdaptiveTone(frame([230,230,230]));
+assert.ok(next.white>before.white&&next.white<target.white*.5,'video exposure changes gradually');
+assert.equal(gridAdaptiveTone(dark,media,0).white,p.white,'backward seek resets exposure');
+assert.equal(gridAdaptiveTone(black).tone(0),0);
+console.log('Adaptive tone: dark blue visibility, black/noise rejection, glyph brightness, temporal smoothing and seek reset passed.');
