@@ -1,7 +1,7 @@
 const DotMatrixPalettes = [
-  {id:'spectrum',name:'Спектр',colors:['#FF8A00','#FF248C','#7628FF','#00D9ED']},
   {id:'confa',name:'Оранжевый и синий',colors:['#FF6E14','#FFFFFF','#34A4FA','#3E6BFF']},
   {id:'cool',name:'Бирюза и фиолетовый',colors:['#25E5D0','#34A4FA','#8060F5','#C477FF']},
+  {id:'ember',name:'Огненный',colors:['#D8C1A5','#EF4000','#B40100','#70120B']},
   {id:'mono',name:'Монохром',colors:['#FFFFFF','#FFFFFF','#FFFFFF','#FFFFFF']}
 ];
 /** Global lattice; area averaging removes texture and attenuates narrow structures.

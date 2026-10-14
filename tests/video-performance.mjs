@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {gridVideoPolicy,gridResizeMask,gridPublishVideoFrame,gridWaitForFullFrame} from '../source/video-performance.js';
+const video=Object.assign(new EventTarget(),{tagName:'VIDEO',paused:false,currentTime:1});
+assert.equal(gridVideoPolicy(video).size,300);
+assert.ok(gridVideoPolicy(video,100).interval>=250,'preview leaves time for other work');
+video.paused=true;assert.equal(gridVideoPolicy(video).size,600);
+video.paused=false;video.gridExporting=true;assert.equal(gridVideoPolicy(video).size,600);
+video.gridExporting=false;video.gridFullFrame=true;assert.equal(gridVideoPolicy(video).size,600);
+assert.equal(gridVideoPolicy({tagName:'IMG'}).size,600);
+const mask=new Uint8ClampedArray(600*600);mask[100*600+200]=255;
+assert.equal(gridResizeMask(mask,600),mask);assert.equal(gridResizeMask(mask,300)[50*300+100],255);
+const waiting=gridWaitForFullFrame(video);gridPublishVideoFrame(video,300);assert.equal(video.gridNeedsFullFrame,true);
+gridPublishVideoFrame(video,600);await waiting;assert.equal(video.gridNeedsFullFrame,false);
+await assert.rejects(gridWaitForFullFrame(video,1),/подготовить кадр/);
+console.log('Video quality: adaptive budget, pause/export/image resolution, mask mapping and full-frame acknowledgement passed.');
