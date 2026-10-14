@@ -6,7 +6,7 @@ function replace(text, from, to) {
   if (!text.includes(from)) throw new Error(`Missing dot-matrix hook: ${from}`);
   return text.replace(from, to);
 }
-const paletteUI = 'P==="dotmatrix"&&U.jsxs("div",{className:"dot-palette-control",children:[U.jsx("select",{id:"dot-palette","aria-label":"Градиент точек",value:dotPalette,onChange:event=>{const preset=DotMatrixPalettes.find(p=>p.id===event.target.value);if(preset){setDotPalette(preset.id);setDotColors(preset.colors);L(0)}},children:DotMatrixPalettes.map(p=>U.jsx("option",{value:p.id,children:p.name},p.id))}),U.jsx("div",{"aria-hidden":"true",style:{height:12,borderRadius:6,marginTop:10,background:"linear-gradient(90deg,"+dotColors.join(",")+")"}})]}),';
+const paletteUI = 'P==="dotmatrix"&&U.jsxs("div",{className:"dot-palette-control",children:[U.jsx("select",{id:"dot-palette","aria-label":"Градиент точек",value:dotPalette,onChange:event=>{const preset=DotMatrixPalettes.find(p=>p.id===event.target.value);if(preset){setDotPalette(preset.id);setDotColors(preset.colors);L(0)}},children:DotMatrixPalettes.map(p=>U.jsx("option",{value:p.id,children:p.name},p.id))}),U.jsxs("label",{style:{display:"flex",alignItems:"center",gap:8,marginTop:12},children:[U.jsx("input",{type:"checkbox",checked:dotAnimate,onChange:e=>setDotAnimate(e.target.checked),"aria-label":"Анимация градиента"}),"Анимация градиента"]}),U.jsx("div",{"aria-hidden":"true",style:{height:12,borderRadius:6,marginTop:10,background:"linear-gradient(90deg,"+dotColors.join(",")+")"}})]}),';
 for (const name of ['assets/index-BwYdjEfo.js', 'Grid Studio.html']) {
   const file = new URL(name, root);
   let text = await fs.readFile(file, 'utf8');
@@ -29,6 +29,15 @@ for (const name of ['assets/index-BwYdjEfo.js', 'Grid Studio.html']) {
     text = replace(text, 'setActionClarity(16),y.current=0', 'setActionClarity(16),setDotPalette("spectrum"),setDotColors(DotMatrixPalettes[0].colors),y.current=0');
 
   }
+  if(!text.includes('[dotAnimate,setDotAnimate]')){
+    text=replace(text,'[dotPalette,setDotPalette]=','[dotAnimate,setDotAnimate]=O.useState(true),[dotPalette,setDotPalette]=');
+    text=replace(text,'let at=0,bt=null,Rt=!1,oe=null,Me=null;','let at=0,bt=null,Rt=!1,oe=null,Me=null,dotPrepared=null;');
+    text=replace(text,'if(oe&&!su&&(y.current+=Wt),Rt&&Je===bt){','const dotMoving=dotAnimate&&!su&&dotPalette!=="mono"&&(P==="dotmatrix"||Object.values(K).some(cell=>cell.mode==="dotmatrix"));if(dotMoving&&Rt&&Je===bt&&El-fu<1000/30){at=requestAnimationFrame(ya);return}if(oe&&!su&&(y.current+=Wt),Rt&&Je===bt&&!dotMoving){');
+    text=replace(text,'bt=Je,Rt=!0,Mt.fillStyle=', 'if(bt!==Je)dotPrepared=null;bt=Je,Rt=!0,Mt.fillStyle=');
+    text=replace(text,'?renderDotMatrix(Mt.getImageData(0,0,600,600).data,600,600,J.dotmatrix,W/100,null,dotColors):null','?(dotPrepared||(dotPrepared=renderDotMatrix(Mt.getImageData(0,0,600,600).data,600,600,J.dotmatrix,W/100,null,dotColors))).repaintGradient(dotMoving?(El%12000)/12000:null):null');
+    text=replace(text,'actionClarity,dotColors,','actionClarity,dotColors,dotAnimate,dotPalette,');
+  }
+  text=text.replace('(El%12000)/12000','(El%20000)/20000');
   const paletteStart = text.indexOf('P==="dotmatrix"&&U.jsxs("div",{className:"dot-palette-control"');
   if (paletteStart >= 0) {
     const paletteEnd = text.indexOf('qn.sizeLabel&&Ge(', paletteStart);

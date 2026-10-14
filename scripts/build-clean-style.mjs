@@ -68,4 +68,11 @@ await import('./build-grid-controls.mjs');
 await import('./build-dot-matrix.mjs');
 await import('./build-compact-panel.mjs');
 
-await import('./build-circle-packing.mjs');
+await import('./build-ribbon-stretch.mjs');
+await import('./build-letters-color.mjs');
+await import('./build-random-mix.mjs');
+await import('./build-transitions.mjs');
+
+await import('./build-letters-interaction.mjs');
+
+await import('./build-video.mjs');
