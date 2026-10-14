@@ -1,0 +1,6 @@
+.DS_Store
+node_modules/
+.workshop-build/
+presentation/
+previews/
+design-reference.json
