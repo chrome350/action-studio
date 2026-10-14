@@ -23,11 +23,10 @@ function patch(text) {
   text = text.replace('Ih={clean:12,', 'Ih={clean:18,').replace('[Q,Ut]=O.useState(85)', '[Q,Ut]=O.useState(80)').replace('[Lt,It]=O.useState(16)', '[Lt,It]=O.useState(8)');
   text = text.replace('ct(Ih),Ut(85),It(16)', 'ct(Ih),Ut(80),It(8)');
   text = text.replace('label:"Чистое",description:"Плавная смесь краски и бумаги со свечением контуров."', 'label:"Чистый",description:"Светлое ядро, цветные ореолы и мягкие засветы ярких участков."');
-  if (!text.includes('className:"palette-presets"')) text = replaceOnce(text, 'children:"Два цвета"}),', 'children:"Два цвета"}),' + ui);
   text = text.replace(/U\.jsxs\("div",\{className:"color-row",children:\[U\.jsx\("label",\{htmlFor:"ink-color"[\s\S]*?(?=Ge\("Контраст")/, '');
   text = text.replace(',Ge("Гамма",j,.2,3,at=>I(Number(at.toFixed(2))),"",.05)', '');
   text = text.replace('Ge("Яркость",Y,0,200,V,"%")]}),U.jsxs("section",{className:"panel-section",children:[U.jsx("h2",{children:"Два цвета"})', 'Ge("Яркость",Y,0,200,V,"%"),U.jsxs("div",{className:"image-colors",children:[U.jsx("h3",{children:"Два цвета"})');
-  text = text.replace('Ge("Контраст",W,0,300,yt,"%")]}),U.jsxs("section"', 'Ge("Контраст",W,0,300,yt,"%")]})]}),U.jsxs("section"');
+  if (text.includes('className:"image-colors"')) text = text.replace('Ge("Контраст",W,0,300,yt,"%")]}),U.jsxs("section"', 'Ge("Контраст",W,0,300,yt,"%")]})]}),U.jsxs("section"');
   text = text.replace('Ge("Яркость",Y,0,200,V,"%"),U.jsxs("div",{className:"image-colors"', 'Ge("Яркость",Y,0,200,V,"%"),Ge("Контраст",W,0,300,yt,"%"),U.jsxs("div",{className:"image-colors"');
   text = text.replace('},at.name))}),Ge("Контраст",W,0,300,yt,"%")]})]})', '},at.name))})]})]})');
   text = text.replace('ol.mode==="clean"&&ob(cl.data,B,Z,W/100,j)', 'ol.mode==="clean"&&GridCleanStyle.applyBase(cl.data,B,W/100,j)');
@@ -46,6 +45,8 @@ function patch(text) {
     text = replaceOnce(text, 'ct(Ih),Ut(80),It(16),y.current=0', 'ct(Ih),Ut(80),It(16),setActionClarity(16),y.current=0');
     text = replaceOnce(text, 'Ge("Шлейф движения",Lt,0,40,at=>{It(at),L(0)}," px")', 'Ge("Шлейф движения",Lt,0,40,at=>{It(at),L(0)}," px"),Ge("Размер чёткой зоны",actionClarity,0,100,at=>{setActionClarity(at),L(0)},"%")');
   }
+  const colorPanel = ',U.jsxs("div",{className:"image-colors",children:[U.jsx("h3",{children:"Два цвета"}),' + ui.slice(0, -1) + ']})';
+  text = text.replace(colorPanel, '');
   return text;
 }
 for (const name of ['assets/index-BwYdjEfo.js', 'Grid Studio.html']) {
@@ -63,3 +64,8 @@ offline = offline.replace('</style>', css + '</style>');
 await fs.writeFile(offlineFile, offline);
 console.log('Updated the hosted runtime and self-contained offline HTML.');
 await import('./build-fonts.mjs');
+await import('./build-grid-controls.mjs');
+await import('./build-dot-matrix.mjs');
+await import('./build-compact-panel.mjs');
+
+await import('./build-circle-packing.mjs');
