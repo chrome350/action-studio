@@ -32,13 +32,14 @@ dialog button[type=submit],#work-actions>button,.admin-wrap button{border:0;bord
 /* Circular voting control; keep the count separate from the moving button. */
 #work-actions{padding:24px 0 12px}
 .like-control{display:flex;align-items:center;gap:20px;min-height:72px}
-.like-button{display:grid;place-items:center;width:64px;height:64px;padding:0;border:0;border-radius:50%;background:#fff;color:#f46b78;box-shadow:0 12px 24px -8px #f46b7866;transition:background .22s,color .22s,box-shadow .22s,transform .18s;-webkit-tap-highlight-color:transparent}
-.like-button svg{width:28px;height:28px;fill:currentColor;overflow:visible}
-.like-button:hover{background:#fff4f5;transform:translateY(-2px);box-shadow:0 15px 28px -8px #f46b7880}
-.like-button[aria-pressed=true]{background:#f46b78;color:#fff}
-.like-button[aria-pressed=true]:hover{background:#f97b87}
+.like-button{display:grid;place-items:center;width:64px;height:64px;padding:0;border:0;border-radius:50%;background:linear-gradient(#ffffff18,#ffffff04 45%,#00000012),#ffffff08;color:#b5b5bd;box-shadow:0 2px 5px #0003,0 0 0 1px #0003,inset 0 1px 1px #ffffff8c,inset 1px 0 2px #ffffff40,inset -1px 0 2px #ffffff40,inset 0 -1px 1px #0009,inset 0 2px 5px #ffffff18,inset 0 -3px 6px #ffffff12;backdrop-filter:blur(4px) saturate(1.6);-webkit-backdrop-filter:blur(4px) saturate(1.6);transition:background .22s,color .22s,box-shadow .22s,transform .18s;-webkit-tap-highlight-color:transparent}
+.like-button svg{width:28px;height:28px;fill:transparent;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;overflow:visible;transition:fill .22s,color .22s}
+.like-button:hover{background-color:#ffffff12;color:#fff;transform:translateY(-2px)}
+.like-button[aria-pressed=true]{background-color:#ffffff18;color:#fff}
+.like-button[aria-pressed=true] svg{fill:currentColor}
+.like-button[aria-pressed=true]:hover{background-color:#ffffff22}
 .like-button:active{transform:scale(.9)}
-.like-button:focus-visible{outline:2px solid #f9b1b9;outline-offset:5px}
+.like-button:focus-visible{outline:2px solid #bfaaff;outline-offset:5px}
 .like-button:disabled{opacity:1;cursor:default;transform:none}
 .like-count{min-width:2ch;font:28px/1 Display,Arial;font-variant-numeric:tabular-nums;color:#f5f5f7}
 .like-pop .like-button{animation:like-bounce .6s cubic-bezier(.22,.68,.3,1)}
