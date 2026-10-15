@@ -37,17 +37,17 @@ const rules = `/* grid-controls:start */
 @media(prefers-reduced-motion:reduce){.grid-dimension input{transition:none}}
 .grid-line-control{margin:12px 0}
 .grid-line-control>label{display:block;margin-bottom:6px;color:#bcbcbc;font-size:10px;line-height:1.5}
-.grid-line-fields{display:flex;align-items:center;height:36px;background:#222424;border:1px solid #ffffff20;border-radius:8px;overflow:hidden;transition:border-color .18s}
-.grid-line-fields:hover{border-color:#ffffff40}
-.grid-line-fields:focus-within{outline:2px solid #8323f1;outline-offset:1px;border-color:#8323f1}
+.grid-line-fields{display:flex;align-items:center;height:36px;background:#222424;border:1px solid transparent;border-radius:8px;overflow:hidden;transition:border-color .18s}
+.grid-line-fields:hover{border-color:transparent}
+.grid-line-fields:focus-within{outline:2px solid #8323f1;outline-offset:1px}
 .grid-line-color{display:flex;align-items:center;gap:8px;padding:0 8px;flex:1;min-width:0}
-.grid-line-color .color-swatch{width:22px;height:22px;border-radius:5px;flex-shrink:0;border:1px solid #ffffff38}
+.grid-line-color .color-swatch{width:22px;height:22px;border-radius:5px;flex-shrink:0;border:1px solid transparent}
 .grid-line-color .color-swatch:focus-visible{outline:2px solid #aa72ff;outline-offset:2px}
 .grid-line-fields input{width:100%;min-width:0;padding:0;margin:0;border:0;background:transparent;color:#fff;font-family:AvitoSansTextMono,monospace;font-size:12px;font-weight:400;line-height:1.4;height:34px;outline:none}
-.grid-line-opacity{display:flex;align-items:center;gap:6px;flex:0 0 84px;padding:0 10px;border-left:1px solid #ffffff14;color:#aaa;font-family:AvitoSansTextMono,monospace;font-size:12px}
-.grid-line-opacity input{text-align:right;appearance:textfield;-moz-appearance:textfield}
+.grid-line-opacity{display:flex;align-items:center;gap:6px;flex:0 0 62px;padding:0 10px;border-left:1px solid #292b2b;color:#aaa;font-family:AvitoSansTextMono,monospace;font-size:12px}
+.grid-line-opacity input{text-align:left;appearance:textfield;-moz-appearance:textfield}
 .grid-line-opacity input::-webkit-inner-spin-button,.grid-line-opacity input::-webkit-outer-spin-button{appearance:none;-webkit-appearance:none;margin:0}
-@media(max-width:960px){.grid-line-control>label{font-size:11px}.grid-line-fields{height:44px}.grid-line-fields input{height:42px;font-size:16px}.grid-line-opacity{flex-basis:92px}.grid-line-color .color-swatch{width:26px;height:26px}}
+@media(max-width:960px){.grid-line-control>label{font-size:11px}.grid-line-fields{height:44px}.grid-line-fields input{height:42px;font-size:16px}.grid-line-opacity{flex-basis:66px}.grid-line-color .color-swatch{width:26px;height:26px}}
 @media(prefers-reduced-motion:reduce){.grid-line-fields{transition:none}}
 .grid-line-row{display:flex;align-items:center;gap:8px}
 .grid-line-row .grid-line-fields{flex:1;min-width:0}

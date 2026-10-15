@@ -2,6 +2,14 @@
  * Background inference is deliberately conservative: unselected foreground pixels remain
  * byte-identical; the painted edge deforms continuously. Best suited to a subject on a uniform background.
  */
+function nearestRibbonCoordinate(values,value) {
+  let low=0,high=values.length;
+  while(low<high){const middle=(low+high)>>>1;if(values[middle]<value)low=middle+1;else high=middle;}
+  if(!low)return values[0];
+  if(low===values.length)return values[low-1];
+  // The original ascending reduce kept the smaller coordinate on equal distance.
+  return value-values[low-1]<=values[low]-value?values[low-1]:values[low];
+}
 export function ribbonPixels(data, width, height, length=75, capture=8, bend=30, direction='left', mask=null) {
   const out=new Uint8ClampedArray(data);
   if(!mask || !length || !mask.some(v=>v)) return out;
@@ -22,7 +30,7 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
   const bg=channels.map(a=>a.sort((a,b)=>a-b)[Math.floor(a.length/2)]);
   const foreground=new Float32Array(width*height);
   for(let p=0;p<foreground.length;p++) {
-    const i=p*4, delta=Math.max(...bg.map((v,c)=>Math.abs(data[i+c]-v)));
+    const i=p*4, delta=Math.max(Math.abs(data[i]-bg[0]),Math.abs(data[i+1]-bg[1]),Math.abs(data[i+2]-bg[2]));
     foreground[p]=smooth((delta-4)/18)*(data[i+3]/255);
   }
   // Work in an oriented coordinate system: the ribbon always extends toward
@@ -62,13 +70,13 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
   const sample=(x,y)=>{
     x=clamp(x,0,width-1);y=clamp(y,0,height-1);
     const x0=Math.floor(x),y0=Math.floor(y),fx=x-x0,fy=y-y0;
-    const rgb=[0,0,0];let alpha=0;
+    let red=0,green=0,blue=0,alpha=0;
     for(let dy=0;dy<2;dy++)for(let dx=0;dx<2;dx++){
       const i=(Math.min(height-1,y0+dy)*width+Math.min(width-1,x0+dx))*4;
       const w=(dx?fx:1-fx)*(dy?fy:1-fy)*data[i+3]/255;
-      alpha+=w;for(let c=0;c<3;c++)rgb[c]+=data[i+c]*w;
+      alpha+=w;red+=data[i]*w;green+=data[i+1]*w;blue+=data[i+2]*w;
     }
-    return [...rgb.map(c=>alpha?c/alpha:0),alpha];
+    return [alpha?red/alpha:0,alpha?green/alpha:0,alpha?blue/alpha:0,alpha];
   };
   for(const surface of surfaces) {
   const {top,bottom,fitted}=surface;
@@ -76,13 +84,18 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
   let count=0,sumU=0,sumY=0,sumUU=0,sumUY=0;
   for(const [y,xs] of surface.rows)for(const u of xs){count++;sumU+=u;sumY+=y;sumUU+=u*u;sumUY+=u*y}
   const heading=clamp(-(sumUY-sumU*sumY/count)/Math.max(1,sumUU-sumU*sumU/count),-.65,.65);
+  // Outside all possible seams/reaches a pixel cannot belong to this surface.
+  // The extra pixel on each side also covers Float64 interpolation rounding.
+  let minimumEdge=Infinity,maximumEdge=-Infinity;
+  for(const row of fitted){minimumEdge=Math.min(minimumEdge,row[0]-row[1]);maximumEdge=Math.max(maximumEdge,row[0]);}
+  const firstU=Math.max(0,Math.floor(minimumEdge-reach)-1),lastU=Math.min(width-1,Math.ceil(maximumEdge)+1);
   function profile(y) {
     // Clamp during inversion, then test the solved coordinate. An output pixel
     // outside the original patch may belong to its bent surface.
     const v=clamp(y-top,0,fitted.length-1),a=Math.floor(v),b=Math.min(fitted.length-1,a+1),t=v-a;
     return [fitted[a][0]*(1-t)+fitted[b][0]*t,fitted[a][1]*(1-t)+fitted[b][1]*t,1];
   }
-  for(let y=0;y<height;y++)for(let u=0;u<width;u++) {
+  for(let y=0;y<height;y++)for(let u=firstU;u<=lastU;u++) {
     const dest=pixel(u,y),selected=mask[dest]/255*smooth(distance[dest]/Math.max(1,width*.012));
     // Unpainted object pixels (including centre and stems) remain exact.
     if(foreground[dest]>=1 && !selected)continue;
@@ -114,9 +127,9 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
     for(let oy=0;oy<2;oy++) {
       const ry=clamp(row0+oy,top,bottom);
       let validRow=ry;
-      if(!surface.rows.has(validRow))validRow=surface.ys.reduce((best,v)=>Math.abs(v-ry)<Math.abs(best-ry)?v:best,surface.ys[0]);
+      if(!surface.rows.has(validRow))validRow=nearestRibbonCoordinate(surface.ys,ry);
       const xs=surface.rows.get(validRow);
-      const nearest=xs.reduce((best,v)=>Math.abs(v-sourceU)<Math.abs(best-sourceU)?v:best,xs[0]);
+      const nearest=nearestRibbonCoordinate(xs,sourceU);
       const su=Math.abs(nearest-sourceU)>1?nearest:sourceU;
       const c=sample(flip?width-1-su:su,validRow),w=oy?fraction:1-fraction;
       for(let ch=0;ch<4;ch++)color[ch]+=c[ch]*w;
@@ -128,7 +141,7 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
     const bright=Math.max(color[0],color[1],color[2])/255;
     const below=sample(flip?width-1-sourceU:sourceU,clamp(sy+height/300,0,height-1));
     const above=sample(flip?width-1-sourceU:sourceU,clamp(sy-height/300,0,height-1));
-    const contrast=Math.max(...color.slice(0,3).map((v,c)=>Math.abs(v-(above[c]+below[c])*.5)))/255;
+    const contrast=Math.max(Math.abs(color[0]-(above[0]+below[0])*.5),Math.abs(color[1]-(above[1]+below[1])*.5),Math.abs(color[2]-(above[2]+below[2])*.5))/255;
     const highlight=smooth((bright-.4)/.45)*smooth(contrast/.12);
     const progression=smooth(u/Math.max(1,pr[0]*.82));
     const edgeFade=.025+.975*Math.pow(progression,1-.65*highlight);
@@ -146,11 +159,10 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
   }
   return out;
 }
-export function renderRibbonStretch(data,width,height,length,capture,bend,direction,mask,source=null,zoom=100,brightness=100) {
+// Keep source sampling on the caller's canvas; the expensive deformation itself
+// consumes only these pixels and the scaled mask, so it can run in a worker.
+export function prepareRibbonSource(data,width,height,mask,source=null,zoom=100,brightness=100) {
   const isVideo=source?.tagName==='VIDEO';
-  const key=[source,mask,width,height,length,capture,bend,direction,zoom,brightness,isVideo?source.currentTime:null];
-  const cached=renderRibbonStretch.cache;
-  if(source&&cached&&key.every((v,i)=>v===cached.key[i]))return cached.canvas;
   // Render the deformation at 2x from the original upload, not an enlarged preview.
   const scale=isVideo?1:2,w=width*scale,h=height*scale;
   const high=document.createElement('canvas');high.width=w;high.height=h;
@@ -167,6 +179,17 @@ export function renderRibbonStretch(data,width,height,length,capture,bend,direct
   if(source&&brightness!==100)for(let i=0;i<hi.data.length;i+=4)for(let c=0;c<3;c++)hi.data[i+c]*=brightness/100;
   const hm=new Uint8ClampedArray(w*h);
   if(mask)for(let y=0;y<h;y++)for(let x=0;x<w;x++)hm[y*w+x]=mask[Math.floor(y/scale)*width+Math.floor(x/scale)];
+  return {width:w,height:h,rgba:hi.data,mask:hm};
+}
+export function renderRibbonStretch(data,width,height,length,capture,bend,direction,mask,source=null,zoom=100,brightness=100) {
+  const isVideo=source?.tagName==='VIDEO';
+  const key=[source,mask,width,height,length,capture,bend,direction,zoom,brightness,isVideo?source.currentTime:null];
+  const cached=renderRibbonStretch.cache;
+  if(source&&cached&&key.every((v,i)=>v===cached.key[i]))return cached.canvas;
+  const prepared=prepareRibbonSource(data,width,height,mask,source,zoom,brightness);
+  const w=prepared.width,h=prepared.height,hi={data:prepared.rgba},hm=prepared.mask;
+  const high=document.createElement('canvas');high.width=w;high.height=h;
+  const ctx=high.getContext('2d');
   ctx.putImageData(new ImageData(ribbonPixels(hi.data,w,h,length,capture,bend,direction,hm),w,h),0,0);
   const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
   const preview=canvas.getContext('2d');preview.imageSmoothingEnabled=true;preview.imageSmoothingQuality='high';preview.drawImage(high,0,0,width,height);

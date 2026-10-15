@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 const root=new URL('../',import.meta.url);
-const source=(await fs.readFile(new URL('source/ribbon-stretch.js',root),'utf8')).replaceAll('export function','function');
+const source=(await Promise.all(['source/ribbon-mask.js','source/ribbon-stretch.js'].map(name=>fs.readFile(new URL(name,root),'utf8')))).join('\n').replaceAll('export function','function');
 const module=`/* grid-ribbon-stretch:start */${source}/* grid-ribbon-stretch:end */`;
 function replace(s,a,b){if(!s.includes(a))throw Error('Missing ribbon hook: '+a);return s.replace(a,b)}
 for(const name of ['assets/index-BwYdjEfo.js','Grid Studio.html']){
@@ -32,6 +32,12 @@ for(const name of ['assets/index-BwYdjEfo.js','Grid Studio.html']){
   // must never act on a different flower. Stop cycling while painting.
   s=replace(s,'Ft=O.useRef(null);O.useEffect','Ft=O.useRef(null);O.useEffect(()=>{setRibbonMask(new Uint8ClampedArray(360000))},[rt,x]);O.useEffect(()=>{if(P==="ribbons"&&ribbonBrush){ht(false);vt(false);w({});_e.current=false;ye(false)}},[P,ribbonBrush]);O.useEffect');
  }
+ // The existing selection still resets when image coordinates change. Reusing
+ // an already empty mask avoids an otherwise redundant full canvas render.
+ const previousMaskReset='O.useEffect(()=>{setRibbonMask(new Uint8ClampedArray(360000))},[rt,x]);';
+ const optimizedMaskReset='O.useEffect(()=>{setRibbonMask(resetRibbonMask)},[rt,x]);';
+ if(s.includes(previousMaskReset))s=replace(s,previousMaskReset,optimizedMaskReset);
+ else if(!s.includes(optimizedMaskReset))throw Error('Missing ribbon mask reset hook');
  s=s.replace('Лепестки и детали вытягиваются в плавные цветные ленты. Подведите начало шлейфа к краю объекта.','Выберите кистью края лепестков: ленты вытягиваются из выбранной зоны, основной объект остаётся резким.');
  if(!s.includes('[ribbonShowMask,setRibbonShowMask]')) {
   s=replace(s,'[ribbonBrush,setRibbonBrush]=O.useState(true),','[ribbonBrush,setRibbonBrush]=O.useState(true),[ribbonShowMask,setRibbonShowMask]=O.useState(true),');

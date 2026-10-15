@@ -27,6 +27,12 @@ function useGridVideo(url,kind,source,freeze,setFreeze,canvas,logo,overlay,logoX
     const token=++generation.current;let disposed=false;
     setStatus({ready:false,time:0,duration:0,playing:false,error:''});setRecordError('');clearResult();
     const media=kind==='video'?document.createElement('video'):new Image();source.current=media;
+    if(kind!=='video'){
+      media.gridAnimated=true;
+      fetch(url).then(response=>response.arrayBuffer()).then(buffer=>{
+        if(!disposed)media.gridAnimated=gridImageIsAnimated(new Uint8Array(buffer));
+      }).catch(()=>{});
+    }
     const update=()=>{if(!disposed)setStatus({ready:media.readyState>=2,time:media.currentTime||0,duration:Number.isFinite(media.duration)?media.duration:0,playing:!media.paused,error:''})};
     const fail=()=>{if(!disposed){setStatus(old=>({...old,ready:false,playing:false,error:kind==='video'?'Не удалось открыть видео. Попробуйте MP4 (H.264) или WebM.':'Не удалось открыть изображение.'}));recordingRef.current?.cancel();}};
     media.addEventListener('error',fail);

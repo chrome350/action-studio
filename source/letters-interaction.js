@@ -23,7 +23,9 @@ export function cacheLettersCell(state, canvas, x, y, size, background) {
   if(previous){const oldTiles=new Map(previous.tiles.map(tile=>[tile.key,tile])),ratio=scale/(previous.scale||1);
     for(const tile of tiles){const old=oldTiles.get(tile.key);if(old)for(const key of ['ox','oy','vx','vy'])tile[key]=old[key]*ratio;}
   }
-  state.cells.push({image,x,y,size,scale,tiles,background});
+  // These integer tiles partition the whole bitmap without gaps or overlaps.
+  // Only cells prepared here may use the equivalent single-bitmap draw below.
+  state.cells.push({image,x,y,size,scale,tiles,background,completeTiles:true});
 }
 export function drawLettersInteraction(ctx,state,enabled,radius,strength,reduced,now,gridVisible=true,frozen=false) {
   const dt=Math.min(2,Math.max(.1,(now-(state.last||now-16.67))/16.67));state.last=now;
@@ -44,6 +46,10 @@ export function drawLettersInteraction(ctx,state,enabled,radius,strength,reduced
   for(const cell of state.cells){
     ctx.save();
     if(gridVisible){ctx.beginPath();ctx.rect(cell.x,cell.y,cell.image.width,cell.image.height);ctx.clip();}
+    // Chromium can round alpha differently for a whole bitmap and its tiles
+    // when other effects share the canvas. Keep the original tile path for
+    // mixed scenes; the renderer explicitly opts in for a full Letters frame.
+    let stationary=state.fullFrameLetters===true && cell.completeTiles===true;
     for(const tile of cell.tiles){
       let tx=0,ty=0;
       if(pointer){const dx=(tile.anchorX??cell.x+tile.left+tile.w/2)-pointer.x,dy=(tile.anchorY??cell.y+tile.top+tile.h/2)-pointer.y,d=Math.hypot(dx,dy);
@@ -52,8 +58,10 @@ export function drawLettersInteraction(ctx,state,enabled,radius,strength,reduced
         tile.vx=(tile.vx+(tx-tile.ox)*.12*dt)*Math.pow(.65,dt);tile.vy=(tile.vy+(ty-tile.oy)*.12*dt)*Math.pow(.65,dt);
         tile.ox+=tile.vx*dt;tile.oy+=tile.vy*dt;
       }
-      ctx.drawImage(cell.image,tile.left,tile.top,tile.w,tile.h,cell.x+tile.left+tile.ox,cell.y+tile.top+tile.oy,tile.w,tile.h);
+      if(tile.ox!==0||tile.oy!==0)stationary=false;
     }
+    if(stationary)ctx.drawImage(cell.image,cell.x,cell.y);
+    else for(const tile of cell.tiles)ctx.drawImage(cell.image,tile.left,tile.top,tile.w,tile.h,cell.x+tile.left+tile.ox,cell.y+tile.top+tile.oy,tile.w,tile.h);
     ctx.restore();
   }
   ctx.restore();

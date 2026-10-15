@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 const root=new URL('../',import.meta.url);
-const source=(await fs.readFile(new URL('source/video.js',root),'utf8')).replaceAll('export function','function');
+const source=(await Promise.all(['source/image-animation.js','source/video.js'].map(name=>fs.readFile(new URL(name,root),'utf8')))).join('\n').replaceAll('export function','function');
 const module=`/* grid-video:start */${source}/* grid-video:end */`;
 for(const name of ['assets/index-BwYdjEfo.js','Grid Studio.html']){
  let s=await fs.readFile(new URL(name,root),'utf8');
