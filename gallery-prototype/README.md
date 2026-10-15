@@ -43,3 +43,7 @@ Apply `supabase/schema.sql` once in a new project. Add the administrator's confi
 Images use a private Storage bucket with 5 MB limit. Pending images are visible only to their author and admin; approved images are available through short-lived signed URLs. Impressions are independent of works. The database enforces three likes, stage restrictions, and moderation permissions. Anonymous identity is per browser: another browser or cleared storage can create another participant, so this is a workshop voting limit, not verified-person voting.
 
 On localhost the original Python/SQLite workflow remains active. Append `?cloud` to test Supabase locally. Cloud failure is shown as an error instead of silently falling back to demo works.
+
+## Этапы встречи в админке
+
+Ведущая переключает четыре этапа кнопкой «Далее»: завершение практики и отправка работ (43:00), голосование, впечатления, итоговый показ и обсуждение. Текущий этап выделен в списке и сохраняется после обновления страницы. Кнопка «Назад» возвращает на предыдущий этап, сохраняя работы, голоса и ответы; на первом этапе она недоступна. Настройки показа всегда видны под заголовком. Используются существующие этапы галереи; обновление базы не требуется.

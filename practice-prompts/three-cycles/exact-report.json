@@ -1,0 +1,42 @@
+[
+  {
+    "name": "initial",
+    "pixelExact": true
+  },
+  {
+    "name": "Интенсивность",
+    "pixelExact": true
+  },
+  {
+    "name": "Свечение",
+    "pixelExact": true
+  },
+  {
+    "name": "Шлейф",
+    "pixelExact": true
+  },
+  {
+    "name": "Чёткая зона",
+    "pixelExact": true
+  },
+  {
+    "name": "Масштаб",
+    "pixelExact": true
+  },
+  {
+    "name": "reset same history",
+    "pixelExact": true
+  },
+  {
+    "name": "export same history",
+    "pixelExact": true
+  },
+  {
+    "name": "UI 1440",
+    "pixelExact": true
+  },
+  {
+    "name": "UI 390",
+    "pixelExact": true
+  }
+]

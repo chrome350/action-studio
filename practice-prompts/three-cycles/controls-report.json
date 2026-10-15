@@ -1,0 +1,86 @@
+[
+  {
+    "cycle": 1,
+    "changes": [
+      {
+        "label": "Интенсивность",
+        "changed": true
+      },
+      {
+        "label": "Размер свечения",
+        "changed": true
+      },
+      {
+        "label": "Длина шлейфа",
+        "changed": true
+      },
+      {
+        "label": "Размер чёткой зоны",
+        "changed": true
+      },
+      {
+        "label": "Масштаб",
+        "changed": true
+      }
+    ],
+    "resetMatches": true,
+    "errors": [],
+    "exportDifferentPixels": 531870
+  },
+  {
+    "cycle": 2,
+    "changes": [
+      {
+        "label": "Интенсивность",
+        "changed": true
+      },
+      {
+        "label": "Размер свечения",
+        "changed": true
+      },
+      {
+        "label": "Длина шлейфа",
+        "changed": true
+      },
+      {
+        "label": "Размер чёткой зоны",
+        "changed": true
+      },
+      {
+        "label": "Масштаб",
+        "changed": true
+      }
+    ],
+    "resetMatches": true,
+    "errors": [],
+    "exportDifferentPixels": 529886
+  },
+  {
+    "cycle": 3,
+    "changes": [
+      {
+        "label": "Интенсивность — значение",
+        "changed": true
+      },
+      {
+        "label": "Свечение — значение",
+        "changed": true
+      },
+      {
+        "label": "Шлейф — значение",
+        "changed": true
+      },
+      {
+        "label": "Чёткая зона — значение",
+        "changed": true
+      },
+      {
+        "label": "Масштаб — значение",
+        "changed": true
+      }
+    ],
+    "resetMatches": false,
+    "errors": [],
+    "exportDifferentPixels": 517640
+  }
+]

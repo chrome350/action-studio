@@ -1,0 +1,144 @@
+{
+  "errors": [],
+  "comparisons": [
+    {
+      "name": "default",
+      "differentPixels": 520325,
+      "meanAbsoluteChannelError": 0.3356321444901692,
+      "maxDelta": 33
+    },
+    {
+      "name": "Интенсивность",
+      "differentPixels": 5022,
+      "meanAbsoluteChannelError": 0.034352709190672154,
+      "maxDelta": 32
+    },
+    {
+      "name": "Свечение",
+      "differentPixels": 5005,
+      "meanAbsoluteChannelError": 0.034010916780978506,
+      "maxDelta": 32
+    },
+    {
+      "name": "Шлейф",
+      "differentPixels": 5004,
+      "meanAbsoluteChannelError": 0.03392889803383631,
+      "maxDelta": 32
+    },
+    {
+      "name": "Чёткая зона",
+      "differentPixels": 4983,
+      "meanAbsoluteChannelError": 0.03424982853223594,
+      "maxDelta": 32
+    },
+    {
+      "name": "Масштаб",
+      "differentPixels": 4934,
+      "meanAbsoluteChannelError": 0.030597565157750344,
+      "maxDelta": 32
+    },
+    {
+      "name": "reset",
+      "differentPixels": 4992,
+      "meanAbsoluteChannelError": 0.031983024691358025,
+      "maxDelta": 32
+    },
+    {
+      "name": "grid hidden",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "disabledBeforeUpload": true,
+      "scaleChanges": true,
+      "resetExact": true,
+      "export": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "step": 2,
+      "disabledBeforeUpload": true,
+      "scaleChanges": true,
+      "resetExact": true,
+      "export": [
+        1080,
+        1080
+      ]
+    }
+  ],
+  "desktopGeometry": {
+    "reference": {
+      "aside": [
+        1124,
+        20,
+        300,
+        960
+      ],
+      ".stage": [
+        262,
+        201,
+        600,
+        600
+      ]
+    },
+    "actual": {
+      "aside": [
+        1124,
+        20,
+        300,
+        960
+      ],
+      ".stage": [
+        262,
+        201,
+        600,
+        600
+      ]
+    }
+  },
+  "export": {
+    "size": [
+      1080,
+      1080
+    ],
+    "pixelExact": false
+  },
+  "mobileOverflow": false,
+  "mobileGeometry": {
+    "reference": {
+      "aside": [
+        16,
+        570,
+        358,
+        823.09375
+      ],
+      ".stage": [
+        16,
+        72,
+        358,
+        358
+      ]
+    },
+    "actual": {
+      "aside": [
+        16,
+        524,
+        358,
+        767
+      ],
+      ".stage": [
+        16,
+        72,
+        358,
+        358
+      ]
+    }
+  },
+  "idleRenders": 0
+}

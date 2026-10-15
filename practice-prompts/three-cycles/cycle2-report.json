@@ -1,0 +1,20 @@
+{
+  "cycle": 2,
+  "errors": [],
+  "checks": [],
+  "defaultFrame": {
+    "differentPixels": 529886,
+    "totalPixels": 1166400,
+    "meanAbsoluteChannelError": 0.31173125285779607,
+    "maxChannelError": 24
+  },
+  "canvas": [
+    1080,
+    1080
+  ],
+  "export": [
+    1080,
+    1080
+  ],
+  "mobileOverflow": false
+}
