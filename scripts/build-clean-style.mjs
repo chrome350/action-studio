@@ -90,3 +90,8 @@ await import('./build-watermark.mjs');
 await import('./build-checkboxes.mjs');
 
 await import('./build-action-animation.mjs');
+
+await import('./build-stage-layout.mjs');
+await import('./build-header-logos.mjs');
+await import('./build-flat-panels.mjs');
+await import('./build-slider-style.mjs');

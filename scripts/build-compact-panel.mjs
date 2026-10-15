@@ -35,6 +35,7 @@ function patch(text) {
   return text;
 }
 const rules = `/* grid-compact-panel:start */
+#grid-settings>h2>svg,.image-heading>svg,.effect-heading>h2>svg{display:none}
 aside .grid-line-fields,aside .grid-dimension,aside .parameter-value,aside .gradient-field{background-color:#212323}
 aside #effect-mode{background-color:#222424}
 .grid-cell-count{margin-left:auto;color:#8f9191;font-family:AvitoSansTextMono,monospace;font-size:10px;font-weight:400;white-space:nowrap}
@@ -74,6 +75,20 @@ aside .panel-section:has(>.effect-heading):has(>label.dot-palette-control:last-c
 @media(max-width:960px){aside #grid-settings{padding-top:28.2px}#grid-settings>.grid-dimensions{margin-bottom:6px}aside .panel-section:has(>.effect-heading):has(>label.dot-palette-control:last-child){padding-bottom:18px}}
 aside .grid-line-opacity input{font-size:10px}aside .grid-line-opacity{gap:4px}@media(max-width:960px){aside .grid-line-opacity input{font-size:11px}}
 aside .grid-dimension:hover,aside .parameter-value:hover,aside .grid-line-fields:hover,aside #effect-mode:hover,aside .dot-palette-control select:hover,aside .gradient-field:hover{border-color:#ffffff24}
+aside .panel-reset,aside .replace-image,aside .grid-visibility{color:#fff}
+aside .panel-reset svg,aside .replace-image svg,aside .grid-visibility svg{width:16px;height:16px;color:#fff;stroke:#fff;stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+aside .grid-visibility svg>path,aside .grid-visibility svg>circle{transform:translate(1.2px,1.2px) scale(.9);stroke-width:1.666667}
+aside .panel-title{height:56px;padding-top:12px}
+@media(max-width:960px){aside .panel-title{height:64px}}
+/* Match divider endpoints to the panel text inset. */
+aside{--panel-text-inset:14px;border:0;box-shadow:0 16px 48px #0008}
+aside .panel-title,aside .panel-section{border-bottom:0}
+aside .panel-section{position:relative}
+aside .panel-title::after,aside .panel-section:not(:last-child)::after{content:"";position:absolute;left:var(--panel-text-inset);right:var(--panel-text-inset);bottom:0;height:1px;background:#414343;pointer-events:none}
+@media(max-width:960px){aside{--panel-text-inset:16px;box-shadow:0 8px 24px #0004}aside .panel-title{padding-inline:var(--panel-text-inset)}}
+/* All three action buttons share the same right-aligned icon column. */
+aside .grid-visibility{width:28px;flex-basis:28px}
+@media(max-width:960px){aside .grid-visibility{width:44px;flex-basis:44px}}
 /* grid-compact-panel:end */
 `;
 function styles(text) {
