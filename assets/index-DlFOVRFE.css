@@ -75,6 +75,7 @@ aside .grid-visibility:focus-visible{outline:2px solid #8323f1;outline-offset:2p
 /* grid-controls:end */
 
 /* grid-compact-panel:start */
+#grid-settings>h2>svg,.image-heading>svg,.effect-heading>h2>svg{display:none}
 aside .grid-line-fields,aside .grid-dimension,aside .parameter-value,aside .gradient-field{background-color:#212323}
 aside #effect-mode{background-color:#222424}
 .grid-cell-count{margin-left:auto;color:#8f9191;font-family:AvitoSansTextMono,monospace;font-size:10px;font-weight:400;white-space:nowrap}
@@ -114,6 +115,20 @@ aside .panel-section:has(>.effect-heading):has(>label.dot-palette-control:last-c
 @media(max-width:960px){aside #grid-settings{padding-top:28.2px}#grid-settings>.grid-dimensions{margin-bottom:6px}aside .panel-section:has(>.effect-heading):has(>label.dot-palette-control:last-child){padding-bottom:18px}}
 aside .grid-line-opacity input{font-size:10px}aside .grid-line-opacity{gap:4px}@media(max-width:960px){aside .grid-line-opacity input{font-size:11px}}
 aside .grid-dimension:hover,aside .parameter-value:hover,aside .grid-line-fields:hover,aside #effect-mode:hover,aside .dot-palette-control select:hover,aside .gradient-field:hover{border-color:#ffffff24}
+aside .panel-reset,aside .replace-image,aside .grid-visibility{color:#fff}
+aside .panel-reset svg,aside .replace-image svg,aside .grid-visibility svg{width:16px;height:16px;color:#fff;stroke:#fff;stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+aside .grid-visibility svg>path,aside .grid-visibility svg>circle{transform:translate(1.2px,1.2px) scale(.9);stroke-width:1.666667}
+aside .panel-title{height:56px;padding-top:12px}
+@media(max-width:960px){aside .panel-title{height:64px}}
+/* Match divider endpoints to the panel text inset. */
+aside{--panel-text-inset:14px;border:0;box-shadow:0 16px 48px #0008}
+aside .panel-title,aside .panel-section{border-bottom:0}
+aside .panel-section{position:relative}
+aside .panel-title::after,aside .panel-section:not(:last-child)::after{content:"";position:absolute;left:var(--panel-text-inset);right:var(--panel-text-inset);bottom:0;height:1px;background:#414343;pointer-events:none}
+@media(max-width:960px){aside{--panel-text-inset:16px;box-shadow:0 8px 24px #0004}aside .panel-title{padding-inline:var(--panel-text-inset)}}
+/* All three action buttons share the same right-aligned icon column. */
+aside .grid-visibility{width:28px;flex-basis:28px}
+@media(max-width:960px){aside .grid-visibility{width:44px;flex-basis:44px}}
 /* grid-compact-panel:end */
 
 /* grid-clean-palette */
@@ -140,3 +155,36 @@ aside label:has(>input[type="checkbox"]){cursor:pointer;min-height:24px;font-siz
 @media(prefers-reduced-motion:reduce){aside input[type="checkbox"]{transition:none}}
 @media(forced-colors:active){aside input[type="checkbox"]{appearance:auto;-webkit-appearance:auto}aside input[type="checkbox"]::before{display:none}}
 /* grid-checkboxes:end */
+
+/* grid-stage-layout:start */
+@media(min-width:961px){
+  /* Reserve 52px for the dock, 24px below it and a 12px image gap.
+     Let the top margin collapse before the fixed-size canvas overlaps it. */
+  .canvas-area{padding:clamp(0px,calc(100dvh - 760px),20px) 20px 88px;grid-template-rows:minmax(0,1fr);align-items:safe center}
+}
+/* grid-stage-layout:end */
+
+
+
+/* grid-header-logos:start */
+header{flex-direction:row;justify-content:space-between;align-items:center}
+@media(min-width:961px){header{padding-top:20px;padding-bottom:12px;padding-left:20px}}
+header .brand-logo{display:block;height:40px;width:auto;flex-shrink:0}
+@media(max-width:960px){header{flex-direction:row;justify-content:space-between;align-items:center}header .brand-logo{height:32px}}
+/* grid-header-logos:end */
+
+/* grid-flat-panels:start */
+aside,.stage,.bottom-actions,aside .panel-title,aside .panel-title.is-scrolled{box-shadow:none}
+/* grid-flat-panels:end */
+
+
+/* grid-slider-style:start */
+/* Share the neutral liquid button material across every slider state. */
+.glass-slider-shell .slider-glass-body{background:#ffffff08;box-shadow:0 2px 5px #0003,0 0 0 1px #0003}
+.glass-slider-shell .slider-glass-surface,
+.glass-slider-shell[data-glass-active=true] .slider-glass-surface{background:linear-gradient(160deg,#ffffffb3 0%,#ffffff66 28%,#ffffff26 55%,#ffffff4d 78%,#ffffff80 100%);box-shadow:inset 0 1px 1px #ffffffd9,inset 1px 0 2px #ffffff40,inset -1px 0 2px #ffffff40,inset 0 -1px 1px #0009,inset 0 2px 5px #ffffff18,inset 0 -3px 6px #ffffff12}
+.glass-slider-shell:hover .slider-glass-body{background:#ffffff12}
+.glass-slider-shell:hover .slider-glass-surface,
+.glass-slider-shell[data-pressed=true] .slider-glass-surface,
+.glass-slider-shell[data-force-pressed=true] .slider-glass-surface{box-shadow:inset 0 1px 2px #ffffffb3,inset 1px 0 3px #ffffff50,inset -1px 0 3px #ffffff50,inset 0 -1px 1px #0009,inset 0 3px 7px #ffffff20,inset 0 -3px 7px #ffffff18}
+/* grid-slider-style:end */
