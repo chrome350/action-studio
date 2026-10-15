@@ -9,8 +9,8 @@ aside input[type="checkbox"]:checked::before{opacity:1}
 aside input[type="checkbox"]:hover:not(:disabled){border-color:#b77aff}
 aside input[type="checkbox"]:focus-visible{outline:2px solid #c98aff;outline-offset:3px}
 aside input[type="checkbox"]:disabled{opacity:.4;cursor:default}
-aside label:has(>input[type="checkbox"]){cursor:pointer;min-height:24px}
-@media(max-width:960px){aside label:has(>input[type="checkbox"]){min-height:36px}}
+aside label:has(>input[type="checkbox"]){cursor:pointer;min-height:24px;font-size:10px;color:#bcbcbc}
+@media(max-width:960px){aside label:has(>input[type="checkbox"]){min-height:36px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){aside input[type="checkbox"]{transition:none}}
 @media(forced-colors:active){aside input[type="checkbox"]{appearance:auto;-webkit-appearance:auto}aside input[type="checkbox"]::before{display:none}}
 /* grid-checkboxes:end */

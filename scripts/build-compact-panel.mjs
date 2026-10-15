@@ -35,22 +35,28 @@ function patch(text) {
   return text;
 }
 const rules = `/* grid-compact-panel:start */
+aside .grid-line-fields,aside .grid-dimension,aside .parameter-value,aside .gradient-field{background-color:#212323}
+aside #effect-mode{background-color:#222424}
 .grid-cell-count{margin-left:auto;color:#8f9191;font-family:AvitoSansTextMono,monospace;font-size:10px;font-weight:400;white-space:nowrap}
-.grid-dimension{flex-direction:row;align-items:center;gap:4px;height:36px;padding:0 8px;background:#222424;border:1px solid #ffffff20;border-radius:8px}
-.grid-dimension:hover{border-color:#ffffff40}
-.grid-dimension:focus-within{outline:2px solid #8323f1;outline-offset:1px;border-color:#8323f1}
+.grid-dimension{flex-direction:row;align-items:center;gap:4px;height:36px;padding:0 10px 0 8px;background:#222424;border:1px solid transparent;border-radius:8px}
+.grid-dimension:hover{border-color:transparent}
+.grid-dimension:focus-within{outline:2px solid #8323f1;outline-offset:1px}
 .grid-dimension label{flex:1;min-width:0;font-size:10px}
 .grid-dimension input{font-size:10px;width:34px;height:34px;padding:0;text-align:right;background:transparent;border:0;border-radius:0;appearance:textfield;-moz-appearance:textfield}
 .grid-dimension input:hover{background:transparent;border:0}
 .grid-dimension input:focus{outline:none;border:0}
 .grid-dimension input::-webkit-inner-spin-button,.grid-dimension input::-webkit-outer-spin-button{appearance:none;-webkit-appearance:none;margin:0}
-aside .compact-control{display:grid;grid-template-columns:80px minmax(32px,1fr) 52px;align-items:center;gap:6px;margin-top:8px;min-height:34px}
+aside .compact-control{display:grid;grid-template-columns:80px minmax(32px,1fr) 52px;align-items:center;gap:10px;margin-top:8px;min-height:34px}
+aside .compact-control:has(input[aria-label="Размер кисти — значение"]),aside .compact-control:has(input[aria-label="Изгиб — значение"]){margin-bottom:8px}
 .parameter-label{color:#bcbcbc;font-size:10px;line-height:1.3}
 .compact-control .glass-slider-shell,.compact-control .studio-slider{height:34px;min-width:0}
-.parameter-value{display:flex;align-items:center;justify-content:flex-end;gap:4px;height:26px;padding:0 8px;border:1px solid transparent;border-radius:6px;background:#222424;color:#999;font-family:AvitoSansTextMono,monospace;font-size:10px;min-width:0}
-.parameter-value:hover{border-color:#ffffff30}
+.parameter-value{display:flex;align-items:center;justify-content:flex-end;gap:2px;height:26px;padding:0 10px 0 8px;border:1px solid transparent;border-radius:6px;background:#222424;color:#999;font-family:AvitoSansTextMono,monospace;font-size:10px;min-width:0}
+.parameter-value:hover{border-color:transparent}
 .parameter-value:focus-within{outline:2px solid #8323f1;outline-offset:1px}
-.parameter-value input{width:100%;min-width:0;height:24px;padding:0;border:0;background:transparent;color:#fff;font-family:inherit;font-size:10px;text-align:right;outline:none;appearance:textfield;-moz-appearance:textfield}
+aside #effect-mode,aside .dot-palette-control select{border:1px solid transparent}
+aside #effect-mode:hover,aside .dot-palette-control select:hover{border-color:transparent}
+aside #effect-mode:focus-visible,aside .dot-palette-control select:focus-visible{outline:2px solid #8323f1;outline-offset:1px}
+.parameter-value input{width:100%;min-width:3ch;height:24px;padding:0;border:0;background:transparent;color:#fff;font-family:inherit;font-size:10px;text-align:left;outline:none;appearance:textfield;-moz-appearance:textfield}
 .parameter-value input::-webkit-inner-spin-button,.parameter-value input::-webkit-outer-spin-button{appearance:none;-webkit-appearance:none;margin:0}
 .parameter-value span{flex-shrink:0}
 .image-heading .replace-image{margin-left:auto;display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;border:0;border-radius:6px;background:transparent;color:#bcbcbc;cursor:pointer}
@@ -60,8 +66,14 @@ aside .compact-control{display:grid;grid-template-columns:80px minmax(32px,1fr) 
 .effect-heading h2{margin:0;flex-shrink:0}
 aside .effect-heading #effect-mode{width:154px;min-width:0;height:32px;margin:0;font-size:11px}
 .panel-section .image-heading{margin-bottom:8px;min-height:28px}
+/* Use Image as the spacing baseline, with extra room below Grid. */
+aside #grid-settings{padding-top:16.9px}
+#grid-settings>.grid-dimensions{margin-bottom:8px}
+aside .panel-section:has(>.effect-heading):has(>label.dot-palette-control:last-child){padding-bottom:16px}
 @media(max-width:960px){.grid-dimension{height:44px}.grid-dimension label{font-size:11px}.grid-dimension input{height:42px;font-size:11px;width:36px}aside .compact-control{grid-template-columns:94px minmax(32px,1fr) 60px;min-height:44px}.parameter-label{font-size:11px}.compact-control .glass-slider-shell,.compact-control .studio-slider{height:44px}.parameter-value{height:40px;font-size:11px}.parameter-value input{height:38px;font-size:11px}.image-heading .replace-image{width:44px;height:44px}.panel-section .image-heading{min-height:44px}aside .effect-heading #effect-mode{height:44px;font-size:16px}}
+@media(max-width:960px){aside #grid-settings{padding-top:28.2px}#grid-settings>.grid-dimensions{margin-bottom:6px}aside .panel-section:has(>.effect-heading):has(>label.dot-palette-control:last-child){padding-bottom:18px}}
 aside .grid-line-opacity input{font-size:10px}aside .grid-line-opacity{gap:4px}@media(max-width:960px){aside .grid-line-opacity input{font-size:11px}}
+aside .grid-dimension:hover,aside .parameter-value:hover,aside .grid-line-fields:hover,aside #effect-mode:hover,aside .dot-palette-control select:hover,aside .gradient-field:hover{border-color:#ffffff24}
 /* grid-compact-panel:end */
 `;
 function styles(text) {

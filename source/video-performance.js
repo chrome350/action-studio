@@ -10,10 +10,10 @@ export function gridResizeMask(mask,size) {
   for(let y=0;y<size;y++)for(let x=0;x<size;x++)result[y*size+x]=mask[Math.floor(y*600/size)*600+Math.floor(x*600/size)];
   return result;
 }
-export function gridPublishVideoFrame(media,size) {
+export function gridPublishVideoFrame(media,size,time=media?.currentTime) {
   if(media?.tagName!=='VIDEO')return;
-  if(size===600)media.gridNeedsFullFrame=false;
-  media.gridRenderedSize=size;media.gridRenderedTime=media.currentTime;
+  if(size===600&&Math.abs(time-media.currentTime)<=.001)media.gridNeedsFullFrame=false;
+  media.gridRenderedSize=size;media.gridRenderedTime=time;
   media.gridRenderVersion=(media.gridRenderVersion||0)+1;
   media.dispatchEvent(new Event('gridframe'));
 }

@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
-const source = (await fs.readFile(new URL('source/dot-matrix.js', root), 'utf8')).replace('export function', 'function');
+const source = (await fs.readFile(new URL('source/dot-matrix.js', root), 'utf8')).replaceAll('export function', 'function');
 const module = `/* grid-dot-matrix:start */${source}/* grid-dot-matrix:end */`;
 function replace(text, from, to) {
   if (!text.includes(from)) throw new Error(`Missing dot-matrix hook: ${from}`);

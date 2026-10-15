@@ -4,11 +4,10 @@ const DotMatrixPalettes = [
   {id:'ember',name:'Огненный',colors:['#D8C1A5','#EF4000','#B40100','#70120B']},
   {id:'mono',name:'Монохром',colors:['#FFFFFF','#FFFFFF','#FFFFFF','#FFFFFF']}
 ];
-/** Global lattice; area averaging removes texture and attenuates narrow structures.
- * No random sampling, binary luminance threshold, or per-cell grid restart.
+/** Explicit preparation for one immutable source frame. The caller replaces this
+ * object when the pixels change; mutable arrays are never cached implicitly.
  */
-export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, profile = null, colors = null, phase = null) {
-  const step = Math.max(4, spacing);
+export function prepareDotMatrixSource(data, width, height) {
   const stride = width + 1;
   const integral = new Float64Array(stride * (height + 1));
   const support = new Float64Array(integral.length);
@@ -24,17 +23,12 @@ export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, 
       integral[(y+1)*stride+x+1] = integral[y*stride+x+1] + row;
     }
   }
-  const canvas = document.createElement('canvas');
-  canvas.width = width; canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, width, height);
-  ctx.fillStyle = '#FFFFFF';
-  const stops = Array.isArray(colors) ? colors.filter(c=>/^#[0-9a-f]{6}$/i.test(c)).map(c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16))) : [];
-  const colorAt = t => {
-    const position=Math.max(0,Math.min(1,t))*(stops.length-1);
-    const a=Math.floor(position),b=Math.min(stops.length-1,a+1),mix=position-a;
-    return `rgb(${stops[a].map((v,i)=>Math.round(v+(stops[b][i]-v)*mix)).join(',')})`;
-  };
+  return {data,width,height,stride,integral,support,analysis:null,geometry:null};
+}
+
+function dotMatrixAnalysis(source, step) {
+  if (source.analysis?.step === step) return source.analysis;
+  const {width,height,stride,integral,support}=source;
   const half = step * .85;
   const average = (plane, x, y, radius) => {
     const x0=Math.max(0,Math.floor(x-radius)),x1=Math.min(width,Math.ceil(x+radius));
@@ -53,10 +47,17 @@ export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, 
   samples.sort((a,b)=>a-b);
   const percentile=p=>samples.length?samples[Math.floor((samples.length-1)*p)]:0;
   const low=percentile(.08),high=percentile(.96);
+  return source.analysis={step,half,average,low,high,colorMin,colorMax};
+}
+
+function dotMatrixGeometry(source, step, contrast, profile) {
+  const {width,height,support,integral}=source;
+  const {half,average,low,high,colorMin,colorMax}=dotMatrixAnalysis(source,step);
   const black=profile?.black ?? Math.max(.018,Math.min(.04,low*.20));
   // Minimum span avoids amplifying noise in almost uniform/dark images.
   const white=profile?.white ?? Math.max(black+.18,high+(high-low)*.10);
-  canvas.dotMatrixProfile={black,white};
+  const previous=source.geometry;
+  if(previous && previous.step===step && Object.is(previous.contrast,contrast) && Object.is(previous.black,black) && Object.is(previous.white,white))return previous;
   const dots = [];
   for (let y = step/2; y < height; y += step) for (let x = step/2; x < width; x += step) {
     // Keep a smaller sampling footprint for narrow stems instead of averaging
@@ -83,6 +84,30 @@ export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, 
   const bounds=dots.reduce((b,d)=>({left:Math.min(b.left,d.x),right:Math.max(b.right,d.x),top:Math.min(b.top,d.y),bottom:Math.max(b.bottom,d.y)}),{left:width,right:0,top:height,bottom:0});
   const span=Math.max(1,bounds.right-bounds.left,bounds.bottom-bounds.top);
   const centerX=(bounds.left+bounds.right)/2,centerY=(bounds.top+bounds.bottom)/2;
+  return source.geometry={step,contrast,black,white,dots,span,centerX,centerY};
+}
+
+/** Global lattice; area averaging removes texture and attenuates narrow structures.
+ * No random sampling, binary luminance threshold, or per-cell grid restart.
+ * A prepared source reuses analysis/geometry across palette and contrast edits;
+ * each result still owns its canvas so a pending frame cannot alter the old one.
+ */
+export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, profile = null, colors = null, phase = null, prepared = null) {
+  const step = Math.max(4, spacing);
+  const source=prepared?.data===data && prepared.width===width && prepared.height===height ? prepared : prepareDotMatrixSource(data,width,height);
+  const canvas = document.createElement('canvas');
+  canvas.width = width; canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#FFFFFF';
+  const stops = Array.isArray(colors) ? colors.filter(c=>/^#[0-9a-f]{6}$/i.test(c)).map(c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16))) : [];
+  const colorAt = t => {
+    const position=Math.max(0,Math.min(1,t))*(stops.length-1);
+    const a=Math.floor(position),b=Math.min(stops.length-1,a+1),mix=position-a;
+    return `rgb(${stops[a].map((v,i)=>Math.round(v+(stops[b][i]-v)*mix)).join(',')})`;
+  };
+  const {black,white,dots,span,centerX,centerY}=dotMatrixGeometry(source,step,contrast,profile);
+  canvas.dotMatrixProfile={black,white};
   // Broad, deforming mesh-gradient regions, inspired by the flowing video reference.
   // Geometry is prepared once. Animation repaints colours only.
   canvas.repaintGradient = (phase = null) => {
