@@ -53,3 +53,5 @@ dialog button[type=submit],#work-actions>button,.admin-wrap button{border:0;bord
 @media(max-width:960px){.like-count{font-size:14px}}
 /* Match the artwork viewer to the gallery card frame. */
 #detail{border:0;border-radius:12px;background:#07080b;box-shadow:0 12px 35px #0007,inset 0 0 2px #72ceff99,inset 0 0 7px #259cdbb3,inset 0 0 15px #1684bd80}
+.like-control:has(.like-button[aria-pressed=true]) .like-count{color:#a855ff}
+.like-control:has(.like-button[aria-pressed=true]:hover) .like-count{color:#b66cff}
