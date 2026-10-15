@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const {chromium}=require(process.env.GRID_PLAYWRIGHT_PATH||'playwright');
+const browser=await chromium.launch({channel:'chrome',headless:true});
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const image=await fs.readFile(new URL('../gallery-prototype/assets/starters/frame-1.jpg',import.meta.url));
+ const requests=[];
+ await page.route('https://gallery.test/**',route=>{requests.push(route.request().url());return route.fulfill({contentType:'image/jpeg',body:image})});
+ await page.setContent('<style>'+await fs.readFile(new URL('../gallery-prototype/style.css',import.meta.url),'utf8')+'</style><header></header><main><div id="stage"><div id="cards"></div></div></main><footer><button id="sphere"></button><button id="grid"></button></footer><dialog id="detail"><button id="close"></button><img id="large"></dialog>');
+ await page.addScriptTag({content:await fs.readFile(new URL('../gallery-prototype/app.js',import.meta.url),'utf8')});
+ await page.evaluate(()=>{view(true);for(let i=0;i<150;i++)add('https://gallery.test/'+i+'.jpg','Work '+i)});
+ await page.waitForFunction(()=>!transition&&frameRequest===null);
+ await page.waitForTimeout(250);
+ assert.ok(requests.length>0&&requests.length<150,`initial requests: ${requests.length}`);
+ const initial=requests.length;
+ await page.evaluate(()=>{window.writes=0;new MutationObserver(m=>window.writes+=m.length).observe(container,{subtree:true,attributes:true,attributeFilter:['style']})});
+ await page.waitForTimeout(300);assert.equal(await page.evaluate(()=>window.writes),0,'idle grid does not rewrite layout');
+ await page.evaluate(()=>stage.scrollTop=stage.scrollHeight);
+ await page.waitForFunction(()=>document.querySelectorAll('#cards img')[149].complete&&document.querySelectorAll('#cards img')[149].naturalWidth>0);
+ assert.ok(requests.length>initial,'scroll loads more images');
+ assert.equal(await page.evaluate(()=>window.writes),0,'scroll does not rewrite layout');
+ await page.setViewportSize({width:390,height:844});
+ await page.waitForTimeout(150);
+ assert.ok(await page.evaluate(()=>items[149].p.x+190*items[149].p.s<=stage.clientWidth),'mobile cards fit');
+ await page.evaluate(()=>{add('https://gallery.test/150.jpg','New work')});
+ await page.waitForFunction(()=>items[150].p&&frameRequest===null);
+ await page.evaluate(()=>view(false));await page.waitForFunction(()=>!transition&&!grid);
+ await page.evaluate(()=>view(true));await page.waitForFunction(()=>!transition&&frameRequest===null);
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.evaluate(()=>view(false));await page.waitForFunction(()=>!transition&&!grid);
+ await page.evaluate(()=>view(true));await page.waitForFunction(()=>!transition&&frameRequest===null);
+ assert.deepEqual(errors,[]);
+ console.log(`PASS: 150 cards, ${initial} initial image requests; lazy scroll, idle grid, resize, added work, sphere/grid round trip.`);
+}finally{await browser.close()}
