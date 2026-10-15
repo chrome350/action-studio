@@ -65,7 +65,7 @@ begin
   if action='admin' then
    return jsonb_build_object('participants',(select count(*) from gallery_private.people),'works',coalesce((select jsonb_agg(to_jsonb(w)||jsonb_build_object('likes',(select count(*) from gallery_private.votes v where v.work=w.id)) order by w.created_at) from gallery_private.works w),'[]'::jsonb),'words',coalesce((select jsonb_agg(jsonb_build_object('id',id,'text',text,'status',status) order by created_at) from gallery_private.words),'[]'::jsonb));
   elsif action='admin/settings' then
-   update gallery_private.settings set phase=coalesce(payload->>'phase',phase),liked=coalesce((payload->>'liked')::boolean,liked),words=coalesce((payload->>'words')::boolean,words);
+   update gallery_private.settings set phase=coalesce(payload->>'phase',phase),liked=coalesce((payload->>'liked')::boolean,liked),words=coalesce((payload->>'words')::boolean,words) where id=true;
   elsif action in ('admin/moderate','admin/moderate-word') then
    st:=payload->>'status'; wid:=(payload->>'id')::uuid;
    if st not in ('pending','approved','rejected') or st is null then raise exception 'Неизвестный статус'; end if;
