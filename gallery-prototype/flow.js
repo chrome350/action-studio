@@ -14,7 +14,33 @@ const shown=[...(phase==='upload'&&!state.settings.liked?starterWorks:[]),...sta
 const signature=JSON.stringify([shown.map(w=>[w.id,w.title,w.image]),words]);
 if(signature!==stateSignature){stateSignature=signature;transition=null;container.replaceChildren();items=[];shown.forEach(w=>add(w.image||'/api/image/'+w.id,w.title,w.starter?null:w));words.forEach(w=>{const b=el('div',w.text,'word-card');container.append(b);items.push({b,p:null})});stage.classList.toggle('grid',grid);$('#empty').hidden=items.length>0}
 renderMine();if(selectedWork&&$('#detail').open)renderWork(selectedWork);}
-function renderWork(work){selectedWork=state.works.find(w=>w.id===work.id);const box=$('#work-actions');box.replaceChildren();if(!selectedWork){$('#detail').close();return}work=selectedWork;const phase=state.settings.phase;const liked=state.votes.includes(work.id);const vote=el('button',`${liked?'♥':'♡'} ${work.likes}`);vote.setAttribute('aria-label',liked?'Убрать лайк':'Поставить лайк');vote.setAttribute('aria-pressed',String(liked));vote.disabled=phase!=='voting';vote.onclick=async()=>{vote.disabled=true;try{await api('vote',{id:work.id,liked:!liked});await refresh()}catch(e){toast(e.message)}finally{if(vote.isConnected)vote.disabled=phase!=='voting'}};if(phase!=='upload')box.append(vote);
+let votePending=false;
+function renderWork(work){
+selectedWork=state.works.find(w=>w.id===work.id);
+const box=$('#work-actions');
+if(!selectedWork){box.replaceChildren();$('#detail').close();return}
+work=selectedWork;
+const phase=state.settings.phase,liked=state.votes.includes(work.id);
+if(phase==='upload'){box.replaceChildren();return}
+let control=box.querySelector('.like-control');
+if(!control||control.dataset.work!==work.id){
+box.replaceChildren();control=el('div',undefined,'like-control');control.dataset.work=work.id;
+const button=el('button',undefined,'like-button');button.type='button';
+button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg>';
+const count=el('span',undefined,'like-count');count.setAttribute('aria-live','polite');count.setAttribute('aria-atomic','true');
+control.append(button,count);box.append(control);
+}
+const vote=control.querySelector('button'),count=control.querySelector('.like-count');
+vote.setAttribute('aria-label',liked?'Убрать лайк':'Поставить лайк');vote.setAttribute('aria-pressed',String(liked));vote.disabled=phase!=='voting'||votePending;
+if(count.textContent!==String(work.likes))count.textContent=work.likes;
+vote.onclick=async()=>{
+if(votePending)return;
+votePending=true;vote.disabled=true;
+try{
+await api('vote',{id:work.id,liked:!liked});await refresh();
+if(control.isConnected){control.classList.remove('like-pop');void control.offsetWidth;control.classList.add('like-pop')}
+}catch(e){toast(e.message)}finally{votePending=false;if(selectedWork&&$('#detail').open)renderWork(selectedWork)}
+};
 }
 window.openWork=work=>{selectedWork=null;$('#work-actions').replaceChildren();if(work)renderWork(work)};
 async function refresh(){renderState(await api('state'))}
