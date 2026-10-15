@@ -17,7 +17,7 @@ O.useLayoutEffect(() => {
   const su = window.matchMedia("(prefers-reduced-motion: reduce)").matches, Ae = (Mt) => {
     if (Mt.drawImage(Al, 0, 0), oe && Me) {
       const Wt = qe.getContext("2d");
-      Wt.clearRect(0, 0, renderSize, renderSize), yb(Wt, oe, su ? 0 : y.current, Q, Lt), Wt.globalCompositeOperation = "destination-in", Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
+      Wt.clearRect(0, 0, renderSize, renderSize), yb(Wt, oe, su || !actionAnimate ? null : y.current, Q, Lt), Wt.globalCompositeOperation = "destination-in", Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
     }
     drawLettersInteraction(Mt, lettersMotion.current, lettersInteractive, lettersRadius, lettersStrength, su, performance.now(), v, _e.current);
     Mt.fillStyle = T, Mt.globalAlpha = v ? b / 100 : 0, Mt.beginPath();
@@ -87,8 +87,8 @@ O.useLayoutEffect(() => {
       at = requestAnimationFrame(ya);
       return;
     }
-    if (oe && !su && (y.current += Wt), Rt && Je === bt && !dotMoving && !media?.gridNeedsFullFrame) {
-      (oe && !su || lettersMotion.current.cells.length > 0) && El - fu >= 1e3 / 30 && (Ae(Mt), fu = El), at = requestAnimationFrame(ya);
+    if (oe && !su && actionAnimate && !_e.current && (y.current += Wt * actionSpeed / 100), Rt && Je === bt && !dotMoving && !media?.gridNeedsFullFrame) {
+      (oe && !su && actionAnimate || lettersMotion.current.cells.length > 0) && El - fu >= 1e3 / 30 && (Ae(Mt), fu = El), at = requestAnimationFrame(ya);
       return;
     }
     if (bt !== Je) dotPrepared = null;
@@ -153,4 +153,4 @@ O.useLayoutEffect(() => {
     cancelAnimationFrame(at);
     clearTimeout(renderTimer);
   };
-}, [f, s, v, T, b, x, Y, W, B, Z, j, rt, P, J, K, Q, Lt, actionClarity, dotColors, dotAnimate, dotPalette, ribbonCapture, ribbonBend, ribbonDirection, ribbonMask, lettersPalette, lettersInteractive, lettersRadius, lettersStrength]);
+}, [f, s, v, T, b, x, Y, W, B, Z, j, rt, P, J, K, Q, Lt, actionClarity, actionAnimate, actionSpeed, dotColors, dotAnimate, dotPalette, ribbonCapture, ribbonBend, ribbonDirection, ribbonMask, lettersPalette, lettersInteractive, lettersRadius, lettersStrength]);
