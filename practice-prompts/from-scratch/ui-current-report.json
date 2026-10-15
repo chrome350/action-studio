@@ -1,0 +1,149 @@
+{
+  "checks": [
+    "Масштаб: bounds, empty input, clamping",
+    "Свечение: bounds, empty input, clamping",
+    "HEX input and invalid-input restoration",
+    "Grid capped at 10",
+    "No overflow at all three viewports"
+  ],
+  "layouts": [
+    {
+      "size": {
+        "width": 1440,
+        "height": 1000
+      },
+      "layout": [
+        {
+          "selector": "IMG",
+          "alt": "AVITO",
+          "box": [
+            20,
+            20,
+            123.328125,
+            40
+          ]
+        },
+        {
+          "selector": "IMG",
+          "alt": "ACTION!",
+          "box": [
+            975.84375,
+            20,
+            124.15625,
+            40
+          ]
+        },
+        {
+          "selector": "stage",
+          "box": [
+            262,
+            202,
+            600,
+            600
+          ]
+        },
+        {
+          "selector": "ASIDE",
+          "box": [
+            1124,
+            20,
+            300,
+            960
+          ]
+        }
+      ]
+    },
+    {
+      "size": {
+        "width": 1440,
+        "height": 760
+      },
+      "layout": [
+        {
+          "selector": "IMG",
+          "alt": "AVITO",
+          "box": [
+            20,
+            20,
+            123.328125,
+            40
+          ]
+        },
+        {
+          "selector": "IMG",
+          "alt": "ACTION!",
+          "box": [
+            975.84375,
+            20,
+            124.15625,
+            40
+          ]
+        },
+        {
+          "selector": "stage",
+          "box": [
+            262,
+            72,
+            600,
+            600
+          ]
+        },
+        {
+          "selector": "ASIDE",
+          "box": [
+            1124,
+            20,
+            300,
+            720
+          ]
+        }
+      ]
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "layout": [
+        {
+          "selector": "IMG",
+          "alt": "AVITO",
+          "box": [
+            16,
+            20,
+            98.65625,
+            32
+          ]
+        },
+        {
+          "selector": "IMG",
+          "alt": "ACTION!",
+          "box": [
+            274.671875,
+            20,
+            99.328125,
+            32
+          ]
+        },
+        {
+          "selector": "stage",
+          "box": [
+            16,
+            72,
+            358,
+            358
+          ]
+        },
+        {
+          "selector": "ASIDE",
+          "box": [
+            16,
+            518,
+            358,
+            818.28125
+          ]
+        }
+      ]
+    }
+  ]
+}

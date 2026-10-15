@@ -23,7 +23,7 @@ for(const name of ['assets/index-BwYdjEfo.js','Grid Studio.html']){
   patch('accept:"image/*"','accept:"image/*,video/*"');
   patch('bt&&(_t(URL.createObjectURL(bt)),_e.current=!1,ye(!1),at.target.value="")','bt&&(videoTools.isRecording()||(setMediaKind(bt.type.startsWith("video/")||/\\.(mp4|webm|mov|m4v|ogv)$/i.test(bt.name)?"video":"image"),setMediaName(bt.name),_t(URL.createObjectURL(bt)),L(0),_e.current=!1,ye(!1)),at.target.value="")');
  }
- if(!s.includes('className:"liquid-button-primary",disabled:mediaKind')){
+ if(!s.includes('onClick:mediaKind==="video"?(videoTools.recording?videoTools.stop:videoTools.record):va')){
   patch('className:"liquid-button-primary",onClick:va,children:[U.jsx(pS,{size:14})," Скачать PNG"]', 'className:"liquid-button-primary",disabled:mediaKind==="video"&&!videoTools.status.ready&&!videoTools.recording,onClick:mediaKind==="video"?(videoTools.recording?videoTools.stop:videoTools.record):va,children:[U.jsx(pS,{size:14}),mediaKind==="video"?(videoTools.recording?" Завершить и сохранить":" Экспорт видео"):" Скачать PNG"]');
  }
  s=s.replace('U.jsx(GridVideoControls,{video:videoTools})','U.jsx(GridVideoControls,{video:videoTools,onSaveFrame:va})');

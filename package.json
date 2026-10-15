@@ -2,6 +2,11 @@
   "name": "grid-studio-static",
   "private": true,
   "type": "module",
-  "scripts": { "build": "node scripts/build-clean-style.mjs" },
-  "devDependencies": { "esbuild": "0.25.12" }
+  "scripts": {
+    "build": "node scripts/build-clean-style.mjs",
+    "build:design-system": "node scripts/build-design-system.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
+  }
 }

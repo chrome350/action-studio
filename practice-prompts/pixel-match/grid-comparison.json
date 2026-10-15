@@ -1,0 +1,30 @@
+{
+  "errors": [],
+  "comparisons": [
+    {
+      "name": "default",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "#grid-columns",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "#grid-rows",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "#grid-line-opacity",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    }
+  ],
+  "steps": []
+}

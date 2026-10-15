@@ -1,0 +1,18 @@
+{
+  "thread": "01a14138-5ff7-7aa1-8993-562dcc32c56f",
+  "sha256": "2d91e53fa04563d55647b4c937efd304d0b0b90a5ea742fcbf2039ef98b2719a",
+  "inputs": {
+    "flowers.png": "8d49e37a761dfe0371c0a0f494adff9e266b9a21c9358c3b846e517387fd271b",
+    "action-wordmark.svg": "69132e4a908ffdaa814b66c2d88052650a4ac0b3c9e2d1c07d59fc6777ecf6d6",
+    "prompt-1.txt": "d00b08ee4e6347bdbebad37f5aa0e640975c71914466bad72620511500d2fa56",
+    "prompt-3.txt": "77f1f3e5de5957fc819971062e5a532eb8802618f08eafaea313aa61bc4606a8",
+    "prompt-2.txt": "c8ea58d3ce05459873bb863a9f0dcb18f61493c83ca9e7f210468f694e92b33e",
+    "AvitoSansDisplay-Regular.woff": "26852ee539481adac9caf8e99b91dbd9ea5e997d8be34a1f91269f2b71d87e03",
+    "action-core.js": "d77929f0ef69413e7504ae21d7a3446956e0fbe44c86af8add75d52a0c9d2d7f",
+    "AvitoSansTextMono-Regular.woff2": "2e45475cb30ec5bfb35f726c5a4350367621aae459e9027bf676612c8c526178",
+    "avito-wordmark.svg": "829c9f14e78f02f680aae60595c65e815f3966fdd97ba52f5487be84756719ef",
+    "AvitoSansText-Regular.woff2": "ce9525f743b3b78db607d59af1143fafaaca6d7cc3884b619d53ebe7a27343d7",
+    "specification.txt": "8c9f3a37d43f3abfc5d5ea2bdd5b64c0dc29c5dfb2df72b6d203f633f66210b3"
+  },
+  "isolation": "Fresh projectless chat; input-only instruction, not OS filesystem isolation"
+}

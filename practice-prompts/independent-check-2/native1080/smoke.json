@@ -1,0 +1,65 @@
+{
+  "errors": [],
+  "effects": [
+    {
+      "mode": "clean",
+      "size": [
+        1080,
+        1080
+      ],
+      "worker": "idle",
+      "nonempty": true
+    },
+    {
+      "mode": "letters",
+      "size": [
+        1080,
+        1080
+      ],
+      "worker": "idle",
+      "nonempty": true
+    },
+    {
+      "mode": "dotmatrix",
+      "size": [
+        1080,
+        1080
+      ],
+      "worker": "idle",
+      "nonempty": true
+    },
+    {
+      "mode": "ribbons",
+      "size": [
+        1080,
+        1080
+      ],
+      "worker": "idle",
+      "nonempty": true
+    },
+    {
+      "mode": "clean",
+      "size": [
+        1080,
+        1080
+      ],
+      "worker": "idle",
+      "nonempty": true
+    }
+  ],
+  "export": {
+    "size": [
+      1080,
+      1080
+    ],
+    "sameAsCanvas": true
+  },
+  "videoPlaying": [
+    1080,
+    1080
+  ],
+  "videoPaused": [
+    1080,
+    1080
+  ]
+}

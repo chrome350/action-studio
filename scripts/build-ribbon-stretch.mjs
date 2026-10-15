@@ -57,6 +57,10 @@ for(const name of ['assets/index-BwYdjEfo.js','Grid Studio.html']){
  .replace('U.jsx(ri,{size:"sm","aria-pressed":ribbonBrush,onClick:()=>setRibbonBrush(!ribbonBrush),children:ribbonBrush?"Завершить рисование":"Рисовать кистью"}),','')
  .replace('children:ribbonErase?"Ластик включён":"Ластик"','children:"Ластик"')
  .replace('U.jsx("p",{style:{fontSize:12,color:"#aaa",lineHeight:1.5},children:"Закрасьте край лепестка с небольшим заходом внутрь: выбранная поверхность плавно вытянется в ленту. Центр оставьте невыбранным. Маска не попадёт в PNG."}),','');
+ s=s.replace('[ribbonDirection,setRibbonDirection]=O.useState("left")','[ribbonDirection,setRibbonDirection]=O.useState("auto")')
+ .replaceAll('setRibbonDirection("left")','setRibbonDirection("auto")');
+ if(!s.includes('value:"auto",children:"Авто"'))s=s.replace('children:[U.jsx("option",{value:"left",children:"Влево"})','children:[U.jsx("option",{value:"auto",children:"Авто"}),U.jsx("option",{value:"left",children:"Влево"})');
+ s=s.replace('U.jsxs("label",{className:"dot-palette-control",children:["Направление",U.jsxs("select",{"aria-label":"Направление лент",value:ribbonDirection,onChange:e=>{setRibbonDirection(e.target.value);L(0)},children:[U.jsx("option",{value:"auto",children:"Авто"}),U.jsx("option",{value:"left",children:"Влево"}),U.jsx("option",{value:"right",children:"Вправо"})]})]})','');
  await fs.writeFile(file,s);
 }
 console.log('Ribbon Stretch updated in web and offline builds.');

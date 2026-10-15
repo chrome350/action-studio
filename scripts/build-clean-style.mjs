@@ -95,3 +95,11 @@ await import('./build-stage-layout.mjs');
 await import('./build-header-logos.mjs');
 await import('./build-flat-panels.mjs');
 await import('./build-slider-style.mjs');
+
+await import('./build-empty-state.mjs');
+
+await import('./build-resolution.mjs');
+
+await import('./build-design-system.mjs');
+
+await import('./build-component-catalog.mjs');
