@@ -1,0 +1,33 @@
+let participant='', state=null, stateSignature='', selectedWork=null, uploadData='', apiReady=false, drafts={};
+const profile=new URLSearchParams(location.search).get('participant')||'default';
+const participantKey='action-gallery-participant-'+profile;
+function toast(text){$('#toast').textContent=text;$('#toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').hidden=true,4500)}
+async function api(path,body){const res=await fetch('/api/'+path,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json','X-Participant':participant},body:body===undefined?undefined:JSON.stringify(body)});let data;try{data=await res.json()}catch{throw Error('Сервер галереи недоступен. Запустите локальную рабочую версию.')}if(!res.ok)throw Error(data.error||'Не удалось выполнить действие.');return data}
+function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
+function renderMine(){const list=$('#my-list');list.replaceChildren();const statuses={pending:'На модерации',approved:'Опубликована',rejected:'Не одобрена'};for(const w of state.mine){const row=el('div',undefined,'submission-row');row.append(el('strong',w.title),el('span',statuses[w.status]));list.append(row)}if(!state.mine.length)list.append(el('p','Вы ещё не отправляли работы.'))}
+function renderState(next){state=next;const phase=state.settings.phase;
+$('#session-bar').hidden=phase!=='voting';$('#add-impression').hidden=phase!=='words';$('#vote-budget').textContent=phase==='voting'?`Лайки: ${state.votes.length} из 3`:'';
+$('.upload').hidden=phase!=='upload';$('#empty').textContent=state.settings.liked?'Пока нет работ с лайками':'Здесь скоро появятся работы. Загрузите свою.';
+const shown=state.works.filter(w=>!state.settings.liked||w.likes>0);const words=state.words;
+const signature=JSON.stringify([shown.map(w=>[w.id,w.title]),words]);
+if(signature!==stateSignature){stateSignature=signature;transition=null;container.replaceChildren();items=[];shown.forEach(w=>add('/api/image/'+w.id,w.title,w));words.forEach(w=>{const b=el('div',w.text,'word-card');container.append(b);items.push({b,p:null})});stage.classList.toggle('grid',grid);$('#empty').hidden=items.length>0}
+renderMine();if(selectedWork&&$('#detail').open)renderWork(selectedWork);}
+function renderWork(work){selectedWork=state.works.find(w=>w.id===work.id);const box=$('#work-actions');box.replaceChildren();if(!selectedWork){$('#detail').close();return}work=selectedWork;box.append(el('h2',work.title),el('p',work.author));const phase=state.settings.phase;const liked=state.votes.includes(work.id);const vote=el('button',`${liked?'♥':'♡'} ${work.likes} · ${liked?'Нравится':'Нравится?'}`);vote.setAttribute('aria-pressed',String(liked));vote.disabled=phase!=='voting';vote.onclick=async()=>{vote.disabled=true;try{await api('vote',{id:work.id,liked:!liked});await refresh()}catch(e){toast(e.message)}finally{if(vote.isConnected)vote.disabled=phase!=='voting'}};if(phase!=='upload')box.append(vote);
+}
+window.openWork=work=>{if(work)renderWork(work)};
+async function refresh(){renderState(await api('state'))}
+$('.upload').onclick=()=>{if(!apiReady){toast('Откройте рабочую галерею на порту 8767.');return}$('#submission').showModal()};$('.upload').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('.upload').click()}};
+$('.upload').removeAttribute('for');document.querySelectorAll('.dialog-close').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+let uploadVersion=0;
+async function loadFile(f){const version=++uploadVersion;uploadData='';$('#upload-preview').hidden=true;$('#submit-error').textContent='';if(!f)return;if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>20_000_000){$('#submit-error').textContent='Выберите PNG, JPEG или WebP до 20 МБ.';return}const url=URL.createObjectURL(f);try{const img=new Image();img.src=url;await img.decode();if(version!==uploadVersion)return;const scale=Math.min(1,2000/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));const ctx=c.getContext('2d');ctx.fillStyle='#07080b';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);uploadData=c.toDataURL('image/jpeg',.9);$('#upload-preview').src=uploadData;$('#upload-preview').hidden=false}catch{if(version===uploadVersion)$('#submit-error').textContent='Не удалось открыть изображение.'}finally{URL.revokeObjectURL(url)}}
+$('#files').onchange=e=>loadFile(e.target.files[0]);
+const dropZone=$('#drop-zone');
+for(const type of ['dragenter','dragover'])dropZone.addEventListener(type,e=>{e.preventDefault();dropZone.classList.add('drag-over')});
+for(const type of ['dragleave','drop'])dropZone.addEventListener(type,e=>{e.preventDefault();dropZone.classList.remove('drag-over')});
+dropZone.addEventListener('drop',e=>{if(e.dataTransfer.files.length!==1){$('#submit-error').textContent='Перетащите одно изображение.';return}loadFile(e.dataTransfer.files[0])});
+$('#submission').addEventListener('dragover',e=>e.preventDefault());$('#submission').addEventListener('drop',e=>e.preventDefault());
+$('#submit-form').onsubmit=async e=>{e.preventDefault();const form=e.target,button=form.querySelector('button');if(!uploadData){$('#submit-error').textContent='Дождитесь загрузки изображения.';return}button.disabled=true;$('#submit-error').textContent='';try{await api('submit',{image:uploadData.split(',')[1]});form.reset();uploadData='';$('#upload-preview').hidden=true;$('#submission').close();toast('Работа отправлена на модерацию');await refresh()}catch(err){$('#submit-error').textContent=err.message}finally{button.disabled=false}};
+(async()=>{try{participant=localStorage.getItem(participantKey)||'';if(!participant){participant=(await api('join',{})).token;localStorage.setItem(participantKey,participant)}await refresh();apiReady=true;setInterval(()=>{if(!document.hidden&&!$('#work-actions input:focus'))refresh().catch(()=>{})},2500)}catch{names.forEach((n,i)=>add(art(i),n));toast('Визуальный прототип. Рабочий сценарий: localhost:8767')}})();
+
+$('#add-impression').onclick=()=>$('#impression-dialog').showModal();
+$('#impression-form').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;$('#impression-error').textContent='';try{await api('words',{text:$('#impression-text').value});e.target.reset();$('#impression-dialog').close();toast('Ответ отправлен');await refresh()}catch(err){$('#impression-error').textContent=err.message}finally{button.disabled=false}};
