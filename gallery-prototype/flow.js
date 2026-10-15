@@ -12,7 +12,7 @@ $('#add-impression').hidden=phase!=='words';
 $('.upload').hidden=phase!=='upload';$('#empty').textContent=state.settings.liked?'Пока нет работ с лайками':'Здесь скоро появятся работы. Загрузите свою.';
 const shown=[...(phase==='upload'&&!state.settings.liked?starterWorks:[]),...state.works.filter(w=>!state.settings.liked||w.likes>0)];const words=state.words;
 const signature=JSON.stringify([shown.map(w=>[w.id,w.title,w.image]),words]);
-if(signature!==stateSignature){stateSignature=signature;transition=null;container.replaceChildren();items=[];shown.forEach(w=>add(w.image||'/api/image/'+w.id,w.title,w.starter?null:w));words.forEach(w=>{const b=el('div',w.text,'word-card ds-word-bubble');container.append(b);items.push({b,p:null})});stage.classList.toggle('grid',grid);$('#empty').hidden=items.length>0}
+if(signature!==stateSignature){stateSignature=signature;transition=null;imageObserver?.disconnect();container.replaceChildren();items=[];shown.forEach(w=>add(w.image||'/api/image/'+w.id,w.title,w.starter?null:w));words.forEach(w=>{const b=el('div',w.text,'word-card ds-word-bubble');container.append(b);items.push({b,p:null})});stage.classList.toggle('grid',grid);$('#empty').hidden=items.length>0;requestLayout()}
 renderMine();if(selectedWork&&$('#detail').open)renderWork(selectedWork);}
 let votePending=false;
 function renderWork(work){
