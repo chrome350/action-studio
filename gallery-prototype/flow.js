@@ -1,5 +1,5 @@
 let participant='', state=null, stateSignature='', selectedWork=null, uploadData='', apiReady=false, drafts={};
-const starterWorks=Array.from({length:7},(_,i)=>({id:'starter-'+(i+1),title:'Стартовая работа '+(i+1),image:'assets/starters/frame-'+(i+1)+'.jpg',starter:true}));
+const starterWorks=Array.from({length:11},(_,i)=>({id:'starter-'+(i+1),title:'Стартовая работа '+(i+1),image:'assets/starters/frame-'+(i+1)+'.jpg',starter:true}));
 starterWorks.forEach(w=>add(w.image,w.title));
 const profile=new URLSearchParams(location.search).get('participant')||'default';
 const participantKey='action-gallery-participant-'+profile;
