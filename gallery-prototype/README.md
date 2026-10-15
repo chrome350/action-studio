@@ -33,3 +33,13 @@ python3 gallery-prototype/test_server.py
 ```
 
 Проверяет модерацию, закрытые этапы, параллельное ограничение трёх голосов, независимость участников, ответы и доступ к служебным файлам. Визуально проверены лайк, сохранение ответа и переключение этапов в браузере.
+
+## Online gallery (Supabase)
+
+GitHub Pages serves the same gallery and admin paths. `cloud-config.js` contains only the project URL and publishable key. The bundled client is supabase-js 2.118.0. Never put secret/service-role keys in the frontend.
+
+Apply `supabase/schema.sql` once in a new project. Add the administrator's confirmed email separately to `gallery_private.admins`; enable anonymous sign-ins and set Site URL to the published admin page. The free default email template uses a one-time sign-in link. Only an email-confirmed, non-anonymous account in the admin allowlist can moderate or change stages.
+
+Images use a private Storage bucket with 5 MB limit. Pending images are visible only to their author and admin; approved images are available through short-lived signed URLs. Impressions are independent of works. The database enforces three likes, stage restrictions, and moderation permissions. Anonymous identity is per browser: another browser or cleared storage can create another participant, so this is a workshop voting limit, not verified-person voting.
+
+On localhost the original Python/SQLite workflow remains active. Append `?cloud` to test Supabase locally. Cloud failure is shown as an error instead of silently falling back to demo works.
