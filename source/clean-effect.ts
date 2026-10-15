@@ -7,7 +7,7 @@ export const PRESETS = [
 ];
 
 type BlurPlane = (data: Uint8ClampedArray, width: number, height: number, radius: number) => Uint8ClampedArray;
-type Glow = { image: HTMLCanvasElement };
+type Glow = { image: HTMLCanvasElement; base: HTMLCanvasElement; foreground: HTMLCanvasElement; background: string; mask: HTMLCanvasElement; texture: Uint8ClampedArray; layer: HTMLCanvasElement; output: HTMLCanvasElement; frame: ImageData };
 const clamp = (x: number) => Math.max(0, Math.min(1, x));
 const smooth = (a: number, b: number, x: number) => { const t = clamp((x-a)/(b-a)); return t*t*(3-2*t); };
 const rgb = (hex: string) => [1,3,5].map(i => parseInt(hex.slice(i,i+2),16));
@@ -142,10 +142,93 @@ export function prepare(data: Uint8ClampedArray, width: number, height: number, 
  contrast: number, gamma: number, blur: BlurPlane, accent='#FFFFFF', ink='#07080B',
  intensity=80, trail=16, sourceWidth=width, sourceHeight=height, clarity=16): Glow {
   const result=preparePixels(data,width,height,radius,contrast,gamma,blur,accent,ink,intensity,trail,sourceWidth,sourceHeight,clarity);
+  return prepareGlow(result,data,width,height,contrast,gamma,blur,ink);
+}
+
+/** Attach animation layers to finished pixels from either the worker or fallback. */
+export function prepareGlow(result: Uint8ClampedArray, data: Uint8ClampedArray, width: number, height: number,
+ contrast: number, gamma: number, blur: BlurPlane, ink='#07080B'): Glow {
+  const bg=rgb(ink),pixels=new Float32Array(data.length);
+  for(let i=0;i<data.length;i+=4){
+    const l=(.2126*data[i]+.7152*data[i+1]+.0722*data[i+2])/255;
+    const gain=l>.001?Math.pow(clamp((l-.5)*contrast+.5),1/gamma)/l:0;
+    for(let c=0;c<3;c++)pixels[i+c]=Math.min(255,data[i+c]*gain)*data[i+3]/255;
+  }
   const image=document.createElement('canvas');image.width=width;image.height=height;
   const context=image.getContext('2d')!,frame=context.createImageData(width,height);frame.data.set(result);context.putImageData(frame,0,0);
-  return {image};
+  // Keep the source untouched. All animated light is masked out of its interior.
+  const base=document.createElement('canvas');base.width=width;base.height=height;
+  const mask=document.createElement('canvas');mask.width=width;mask.height=height;
+  const bc=base.getContext('2d')!,baseFrame=bc.createImageData(width,height);
+  const mc=mask.getContext('2d')!,maskFrame=mc.createImageData(width,height);
+  for(let i=0;i<result.length;i+=4){
+    for(let c=0;c<3;c++)baseFrame.data[i+c]=255-(255-bg[c])*(1-pixels[i+c]/255);
+    baseFrame.data[i+3]=255;
+    const peak=Math.max(pixels[i],pixels[i+1],pixels[i+2])/255;
+    maskFrame.data[i+3]=255*smooth(.008,.06,peak);
+  }
+  // Smooth source coverage before compositing: tiny dark/noisy edge pixels
+  // must not punch isolated holes into the moving light behind the filter.
+  const coverage=new Uint8ClampedArray(width*height);
+  for(let p=0;p<coverage.length;p++)coverage[p]=maskFrame.data[p*4+3];
+  const softCoverage=blur(coverage,width,height,2*width/600);
+  for(let p=0;p<coverage.length;p++)maskFrame.data[p*4+3]=softCoverage[p];
+  bc.putImageData(baseFrame,0,0);mc.putImageData(maskFrame,0,0);
+  // Recover a transparent foreground from the finished original filter.
+  // Over its background it reproduces the filter, while new motion sits behind it.
+  const foreground=document.createElement('canvas');foreground.width=width;foreground.height=height;
+  const fc=foreground.getContext('2d')!,ff=fc.createImageData(width,height);
+  for(let i=0;i<result.length;i+=4){
+    let alpha=maskFrame.data[i+3]/255;
+    for(let c=0;c<3;c++){
+      const delta=result[i+c]-bg[c];
+      alpha=Math.max(alpha,delta>=0?delta/Math.max(1,255-bg[c]):-delta/Math.max(1,bg[c]));
+    }
+    alpha=clamp(alpha);
+    for(let c=0;c<3;c++)ff.data[i+c]=alpha>0?(result[i+c]-bg[c]*(1-alpha))/alpha:0;
+    ff.data[i+3]=Math.round(alpha*255);
+  }
+  fc.putImageData(ff,0,0);
+  const layer=document.createElement('canvas');layer.width=layer.height=150;
+  const lc=layer.getContext('2d')!;
+  lc.filter='blur(2px)';lc.drawImage(image,0,0,150,150);lc.filter='none';
+  const texture=lc.getImageData(0,0,150,150).data;
+  const output=document.createElement('canvas');output.width=width;output.height=height;
+  return {image,base,foreground,background:ink,mask,texture,layer,output,frame:lc.createImageData(150,150)};
 }
-export function draw(ctx:CanvasRenderingContext2D,glow:Glow,_time:number,_intensity:number,_trail:number){
-  ctx.save();ctx.globalCompositeOperation='source-over';ctx.drawImage(glow.image,0,0);ctx.restore();
+export function draw(ctx:CanvasRenderingContext2D,glow:Glow,time:number|null,intensity:number,trail:number){
+  ctx.save();ctx.globalCompositeOperation='source-over';
+  if(time===null || intensity<=0){ctx.drawImage(glow.image,0,0);ctx.restore();return;}
+  ctx.fillStyle=glow.background;ctx.fillRect(0,0,glow.image.width,glow.image.height);
+  const phase=(time??0)*Math.PI/8*.7,w=glow.base.width,h=glow.base.height;
+  // Independent slow breathing affects the whole perimeter without stopping
+  // or reversing the clockwise travelling segments.
+  const breath=.5+.5*Math.sin(time*Math.PI/9);
+  const out=glow.frame.data,tex=glow.texture,n=150;
+  for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+    const dx=x-75,dy=y-75,angle=Math.atan2(dy,dx),p=angle-phase;
+    // All segment centres advance with phase; unequal widths and amplitudes
+    // create several distinct extensions rather than one rotating spotlight.
+    const lead=Math.pow(.5+.5*Math.cos(p),12);
+    const second=.68*Math.pow(.5+.5*Math.cos(p-2.15),18);
+    const third=.42*Math.pow(.5+.5*Math.cos(p-4.35),9);
+    const segments=Math.min(1,lead+second+third);
+    const perimeter=.025+.04*breath;
+    const extension=.12*segments*(.85+.15*breath);
+    const stretch=1+(.015+(perimeter+extension)*(0.5+trail/32))*.7;
+    const sx=75+dx/stretch,sy=75+dy/stretch;
+    const ix=Math.floor(sx),iy=Math.floor(sy),fx=sx-ix,fy=sy-iy,i=(y*n+x)*4;
+    const gain=(.38+.38*segments)*(.78+.22*breath)*intensity/100;
+    for(let c=0;c<3;c++){
+      const sample=(xx:number,yy:number)=>xx>=0&&yy>=0&&xx<n&&yy<n?tex[(yy*n+xx)*4+c]:0;
+      out[i+c]=((sample(ix,iy)*(1-fx)+sample(ix+1,iy)*fx)*(1-fy)+(sample(ix,iy+1)*(1-fx)+sample(ix+1,iy+1)*fx)*fy)*gain;
+    }
+    out[i+3]=255;
+  }
+  glow.layer.getContext('2d')!.putImageData(glow.frame,0,0);
+  const oc=glow.output.getContext('2d')!;
+  oc.globalCompositeOperation='source-over';oc.clearRect(0,0,w,h);oc.drawImage(glow.layer,0,0,w,h);
+  // The foreground already occludes this layer; masking twice creates dark fringes.
+  ctx.globalCompositeOperation='screen';ctx.drawImage(glow.output,0,0);
+  ctx.globalCompositeOperation='source-over';ctx.drawImage(glow.foreground,0,0);ctx.restore();
 }

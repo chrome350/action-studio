@@ -39,7 +39,7 @@ O.useLayoutEffect(() => {
   const Ae = (Mt) => {
     if (Mt.drawImage(Al, 0, 0), oe && Me) {
       const Wt = qe.getContext("2d");
-      Wt.clearRect(0, 0, renderSize, renderSize), yb(Wt, oe, su ? 0 : y.current, Q, Lt), Wt.globalCompositeOperation = "destination-in", Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
+      Wt.clearRect(0, 0, renderSize, renderSize), yb(Wt, oe, su || !actionAnimate ? null : y.current, Q, Lt), Wt.globalCompositeOperation = "destination-in", Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
     }
     drawLettersInteraction(Mt, lettersMotion.current, lettersInteractive, lettersRadius, lettersStrength, su, performance.now(), v, _e.current);
     if (v && b > 0) {
@@ -137,8 +137,9 @@ O.useLayoutEffect(() => {
       at = requestAnimationFrame(ya);
       return;
     }
-    if (oe && !su && (y.current += Wt), Rt && Je === bt && !media?.gridNeedsFullFrame && !(animatedImage && dotMoving)) {
-      if ((dotMoving || lettersInteractive && !su && lettersMotion.current.cells.length > 0) && El - fu >= 1e3 / 30) {
+    if (oe && !su && actionAnimate && !_e.current) y.current += Wt * actionSpeed / 100;
+    if (Rt && Je === bt && !media?.gridNeedsFullFrame && !(animatedImage && dotMoving)) {
+      if ((oe && !su && actionAnimate || dotMoving || lettersInteractive && !su && lettersMotion.current.cells.length > 0) && El - fu >= 1e3 / 30) {
         if (dotMoving) repaintDots(El, true);
         present();
         fu = El;
@@ -189,7 +190,7 @@ O.useLayoutEffect(() => {
       if (Ft.current !== Je || gridVideoPolicy(Je, lastWork).size !== renderSize || videoSource && (!Je.complete || Je.paused && Math.abs(Je.currentTime - frameTime) > .001)) {
         Rt = false; at = requestAnimationFrame(ya); return;
       }
-      if (result?.action) actionImage = stages.set("action", actionKey, { image: pixelsCanvas(result.action) });
+      if (result?.action) actionImage = stages.set("action", actionKey, GridCleanStyle.prepareGlow(result.action.rgba, sourceFrame.data, renderSize, renderSize, W / 100, j, qf, B));
       if (result?.ribbons) {
         ribbonImage = pixelsCanvas(result.ribbons);
         ribbonImage.highResolution = pixelsCanvas(result.ribbons.highResolution);
@@ -282,4 +283,4 @@ O.useLayoutEffect(() => {
     cancelAnimationFrame(at);
     clearTimeout(renderTimer);
   };
-}, [f, s, v, T, b, x, Y, W, B, Z, j, rt, P, J, K, Q, Lt, actionClarity, dotColors, dotAnimate, dotPalette, ribbonCapture, ribbonBend, ribbonDirection, ribbonMask, lettersPalette, lettersInteractive, lettersRadius, lettersStrength]);
+}, [f, s, v, T, b, x, Y, W, B, Z, j, rt, P, J, K, Q, Lt, actionClarity, actionAnimate, actionSpeed, dotColors, dotAnimate, dotPalette, ribbonCapture, ribbonBend, ribbonDirection, ribbonMask, lettersPalette, lettersInteractive, lettersRadius, lettersStrength]);

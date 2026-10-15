@@ -88,3 +88,5 @@ await import('./build-gradient-picker.mjs');
 await import('./build-watermark.mjs');
 
 await import('./build-checkboxes.mjs');
+
+await import('./build-action-animation.mjs');

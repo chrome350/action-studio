@@ -71,7 +71,8 @@ function harness(overrides = {}) {
     gridAdaptiveTone() { counts.tone++; return {}; },
     gb() { counts.action++; return {}; },
     yb() { counts.actionDraw++; }, hb() {},
-    GridCleanStyle: { applyBase() { counts.actionBase++; } },
+    qf() {},
+    GridCleanStyle: { prepareGlow() { return { image: canvas() }; }, applyBase() { counts.actionBase++; } },
     lettersColorField() { counts.letters++; return {}; },
     mb() { counts.glyphs++; },
     cacheLettersCell(state, image, x, y, size) { state.cells.push({ image, x, y, size, tiles: [{ ox: 0, oy: 0, vx: 0, vy: 0 }] }); },
@@ -92,7 +93,7 @@ function harness(overrides = {}) {
     f: 3, s: 1, v: true, T: '#ffffff', b: 20, x: 100, Y: 100, W: 100,
     B: '#000000', Z: '#ffffff', j: 1, rt: 0, P: 'clean',
     J: { clean: 24, dotmatrix: 12, letters: 18, ribbons: 20, pixels: 6, dithering: 6, halftone: 6 },
-    K: { 1: { mode: 'letters' }, 2: { mode: 'dotmatrix' } }, Q: 80, Lt: 16, actionClarity: 16,
+    K: { 1: { mode: 'letters' }, 2: { mode: 'dotmatrix' } }, Q: 80, Lt: 16, actionClarity: 16, actionAnimate: false, actionSpeed: 100,
     dotColors: ['#fff', '#f80'], dotAnimate: false, dotPalette: 'confa',
     ribbonCapture: 40, ribbonBend: 20, ribbonDirection: 'vertical', ribbonMask: new Uint8ClampedArray(600 * 600),
     lettersPalette: 'confa', lettersColors: ['#fff'], lettersInteractive: true, lettersRadius: 50, lettersStrength: 30,
@@ -339,3 +340,28 @@ assert.equal(workerRender.counts.composite, before.composite, 'worker result aft
 assert.ok(invalidations >= 4, 'layout replacements invalidate old requests');
 assert.equal(disposals, 1, 'unmount disposes the persistent worker once');
 console.log('Async render integration: worker-only Action preparation, previous picture retention, stale ordering, cache reuse, failure fallback and unmount cancellation passed.');
+
+const glowMotion = harness({ P: 'clean', K: {}, actionAnimate: true, actionSpeed: 100 });
+const glowPrepared = prepared(glowMotion), glowDraws = glowMotion.counts.actionDraw;
+const glowTime = glowMotion.state.y.current;
+for (let frame = 0; frame < 5; frame++) glowMotion.tick();
+assert.deepEqual(prepared(glowMotion), glowPrepared, 'Action animation reuses prepared effect and source');
+assert.equal(glowMotion.counts.actionDraw, glowDraws + 5, 'cached Action frames keep repainting');
+assert.ok(glowMotion.state.y.current > glowTime, 'Action clock advances');
+glowMotion.render({ actionSpeed: 200 });
+const fastTime = glowMotion.state.y.current;
+glowMotion.tick(100);
+assert.ok(Math.abs(glowMotion.state.y.current - fastTime - .2) < 1e-9, 'speed scales the animation clock');
+glowMotion.state._e.current = true;
+const frozenTime = glowMotion.state.y.current, frozenDraws = glowMotion.counts.actionDraw;
+glowMotion.tick();
+assert.equal(glowMotion.state.y.current, frozenTime, 'still capture freezes the animation clock');
+assert.equal(glowMotion.counts.actionDraw, frozenDraws, 'still capture keeps its published frame');
+glowMotion.state._e.current = false;
+glowMotion.render({ actionAnimate: false });
+const stoppedDraws = glowMotion.counts.actionDraw;
+glowMotion.tick();
+assert.equal(glowMotion.counts.actionDraw, stoppedDraws, 'disabled glow does not repaint an idle Action image');
+assert.deepEqual(prepared(glowMotion), glowPrepared, 'animation controls preserve expensive caches');
+glowMotion.dispose();
+console.log('Action animation: cached repaint, speed, still capture and disabled idle state passed.');
