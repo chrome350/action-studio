@@ -22,6 +22,8 @@ with connect() as c:
     CREATE TABLE IF NOT EXISTS words(person TEXT NOT NULL REFERENCES participants(token),work TEXT NOT NULL REFERENCES works(id),text TEXT NOT NULL, PRIMARY KEY(person,work));
     CREATE TABLE IF NOT EXISTS settings(id INTEGER PRIMARY KEY, phase TEXT, liked INTEGER, words INTEGER);
     INSERT OR IGNORE INTO settings VALUES(1,'upload',0,0);''')
+    if 'status' not in [r[1] for r in c.execute('PRAGMA table_info(words)')]:
+        c.execute("ALTER TABLE words ADD COLUMN status TEXT NOT NULL DEFAULT 'pending'")
 class Error(Exception):
     def __init__(self, message, status=400): self.message,self.status=message,status
 class Handler(SimpleHTTPRequestHandler):
@@ -47,12 +49,12 @@ class Handler(SimpleHTTPRequestHandler):
                         works=[dict(r) for r in c.execute("SELECT id,title,author,(SELECT COUNT(*) FROM votes v WHERE v.work=w.id) likes FROM works w WHERE status='approved' ORDER BY created")]
                         votes=[r[0] for r in c.execute('SELECT work FROM votes WHERE person=?',(person,))]
                         mine=[dict(r) for r in c.execute('SELECT id,title,status FROM works WHERE owner=? ORDER BY created DESC',(person,))]
-                        words=[dict(r) for r in c.execute("SELECT w.work,w.text FROM words w JOIN works a ON a.id=w.work WHERE a.status='approved' AND EXISTS(SELECT 1 FROM votes v WHERE v.work=w.work)")] if settings['words'] else []
+                        words=[dict(r) for r in c.execute("SELECT w.work,w.text FROM words w JOIN works a ON a.id=w.work WHERE w.status='approved' AND a.status='approved' AND EXISTS(SELECT 1 FROM votes v WHERE v.work=w.work)")] if settings['words'] else []
                         ownWords={r[0]:r[1] for r in c.execute('SELECT work,text FROM words WHERE person=?',(person,))}
                         return self.reply(dict(settings=settings,works=works,votes=votes,mine=mine,words=words,ownWords=ownWords))
                     if path=='/api/admin':
                         if not self.admin(): raise Error('Нужен ключ администратора.',401)
-                        return self.reply(dict(works=[dict(r) for r in c.execute('SELECT id,title,author,status,(SELECT COUNT(*) FROM votes v WHERE v.work=w.id) likes FROM works w ORDER BY created DESC')],participants=c.execute('SELECT COUNT(*) FROM participants').fetchone()[0]))
+                        return self.reply(dict(works=[dict(r) for r in c.execute('SELECT id,title,author,status,(SELECT COUNT(*) FROM votes v WHERE v.work=w.id) likes FROM works w ORDER BY created DESC')],words=[dict(r) for r in c.execute('SELECT w.rowid id,w.text,w.status,a.title FROM words w JOIN works a ON a.id=w.work')],participants=c.execute('SELECT COUNT(*) FROM participants').fetchone()[0]))
                     if path.startswith('/api/image/'):
                         row=c.execute('SELECT image,mime,status FROM works WHERE id=?',(path.split('/')[-1],)).fetchone()
                         if not row or (row['status']!='approved' and not self.admin()): raise Error('Изображение не найдено.',404)
@@ -86,6 +88,10 @@ class Handler(SimpleHTTPRequestHandler):
                         c.execute('UPDATE works SET status=? WHERE id=?',(body['status'],body['id']))
                         if body['status']!='approved':
                             c.execute('DELETE FROM votes WHERE work=?',(body['id'],));c.execute('DELETE FROM words WHERE work=?',(body['id'],))
+                    elif path=='/api/admin/moderate-word':
+                        if body.get('status') not in ('approved','rejected'):raise Error('Неизвестный статус.')
+                        if not c.execute('SELECT 1 FROM words WHERE rowid=?',(body.get('id'),)).fetchone():raise Error('Ответ не найден.',404)
+                        c.execute('UPDATE words SET status=? WHERE rowid=?',(body['status'],body['id']))
                     elif path=='/api/admin/settings':
                         if body.get('phase') not in ('upload','voting','words','results'):raise Error('Неизвестный этап.')
                         c.execute('UPDATE settings SET phase=?,liked=?,words=? WHERE id=1',(body['phase'],bool(body.get('liked')),bool(body.get('words'))))
@@ -117,7 +123,7 @@ class Handler(SimpleHTTPRequestHandler):
                     text=' '.join(str(body.get('text','')).split())
                     if not 1<=len(text.split())<=3 or len(text)>60:raise Error('Напишите от одного до трёх слов, до 60 символов.')
                     if not c.execute('SELECT 1 FROM votes WHERE work=?',(ident,)).fetchone():raise Error('Выберите работу с лайками.')
-                    c.execute('INSERT INTO words VALUES(?,?,?) ON CONFLICT(person,work) DO UPDATE SET text=excluded.text',(person,ident,text))
+                    c.execute("INSERT INTO words(person,work,text,status) VALUES(?,?,?,'pending') ON CONFLICT(person,work) DO UPDATE SET text=excluded.text,status='pending'",(person,ident,text))
                 else:raise Error('Не найдено.',404)
                 return self.reply({'ok':True})
         except Error as e:self.reply({'error':e.message},e.status)
