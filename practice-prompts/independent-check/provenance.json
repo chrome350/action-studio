@@ -1,0 +1,18 @@
+{
+  "thread": "01a14130-6d36-72e0-aa52-cf92b1bd53c0",
+  "input_archive_sha256": "ed48c39f8aa9085e6fa4be838e59fd8e1ca036e78dc505f68c2329c0920a5c2d",
+  "inputs": {
+    "specification.txt": "192845abde8a3e3761385031c8043547b73443ffe17d0e0dec01cb31d4cfe54c",
+    "prompt-1.txt": "df8d4d73ef50301af713667912a2273d27701893cb99298f8324abfeced384c1",
+    "prompt-2.txt": "2e94bc08d00a708ffb36c9cdd4428da307a610d535dad1035763438ea59e7230",
+    "prompt-3.txt": "8f54e34381ed9efd190a95949ee1cc9a170a952d2c80273cb618caeb9f0b4714",
+    "action-core.js": "d77929f0ef69413e7504ae21d7a3446956e0fbe44c86af8add75d52a0c9d2d7f",
+    "flowers.png": "8d49e37a761dfe0371c0a0f494adff9e266b9a21c9358c3b846e517387fd271b",
+    "avito-wordmark.svg": "829c9f14e78f02f680aae60595c65e815f3966fdd97ba52f5487be84756719ef",
+    "action-wordmark.svg": "69132e4a908ffdaa814b66c2d88052650a4ac0b3c9e2d1c07d59fc6777ecf6d6",
+    "AvitoSansText-Regular.woff2": "ce9525f743b3b78db607d59af1143fafaaca6d7cc3884b619d53ebe7a27343d7",
+    "AvitoSansTextMono-Regular.woff2": "2e45475cb30ec5bfb35f726c5a4350367621aae459e9027bf676612c8c526178",
+    "AvitoSansDisplay-Regular.woff": "26852ee539481adac9caf8e99b91dbd9ea5e997d8be34a1f91269f2b71d87e03"
+  },
+  "method": "New projectless chat, no previous history; instructed to use only participant archive and its own files. No OS-level filesystem isolation was established."
+}

@@ -1,0 +1,9 @@
+Проводите все три шага в одном новом чате, последовательно.
+
+Шаг 1: prompt-1.txt (текст сообщения); specification.txt; rendering-contract.txt; expected-default.png; reference-desktop.png; reference-mobile.png; avito-wordmark.svg; action-wordmark.svg; AvitoSansText-Regular.woff2; AvitoSansTextMono-Regular.woff2; AvitoSansDisplay-Regular.woff; flowers.png (проверочное изображение).
+
+Шаг 2: prompt-2.txt (текст сообщения); action-core.js. Предыдущие вложения и собственный step1.html остаются в чате.
+
+Шаг 3: prompt-3.txt (текст сообщения). Предыдущие вложения и собственный step2.html остаются в чате.
+
+Если шаг выполняется в отдельном новом чате, приложите все предыдущие материалы и HTML, который создал сам участник на предыдущем шаге. Готового HTML редактора в наборе нет. action-core.js — только математика эффекта; весь интерфейс, загрузку, состояние и экспорт участник собирает самостоятельно.

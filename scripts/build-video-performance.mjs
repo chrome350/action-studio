@@ -24,4 +24,4 @@ for(const name of ['assets/index-BwYdjEfo.js','Grid Studio.html']){
  s=s.replace('if(_e.current)media.pause();else media.play().catch(()=>{})','if(_e.current){media.pause();media.gridFullFrame=true;media.gridNeedsFullFrame=true}else{media.gridFullFrame=false;media.play().catch(()=>{})}');
  await fs.writeFile(file,s);
 }
-console.log('Worker effects, adaptive 300px video preview and full-quality pause/export renderer updated.');
+console.log('Worker effects and native 1080px image/video renderer updated.');

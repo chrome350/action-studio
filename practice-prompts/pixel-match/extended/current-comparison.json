@@ -1,0 +1,174 @@
+{
+  "errors": [],
+  "comparisons": [
+    {
+      "name": "default",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Интенсивность",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Свечение",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Шлейф",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Чёткая зона",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Масштаб",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Яркость",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Контраст",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "reset",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "grid hidden",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "second transparent source",
+      "differentPixels": 0,
+      "meanAbsoluteChannelError": 0,
+      "maxDelta": 0
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "disabledBeforeUpload": true,
+      "scaleChanges": true,
+      "resetExact": true,
+      "export": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "step": 2,
+      "disabledBeforeUpload": true,
+      "scaleChanges": true,
+      "resetExact": true,
+      "export": [
+        1080,
+        1080
+      ]
+    }
+  ],
+  "desktopGeometry": {
+    "reference": {
+      "aside": [
+        1124,
+        20,
+        300,
+        960
+      ],
+      ".stage": [
+        262,
+        202,
+        600,
+        600
+      ]
+    },
+    "actual": {
+      "aside": [
+        1124,
+        20,
+        300,
+        960
+      ],
+      ".stage": [
+        262,
+        202,
+        600,
+        600
+      ]
+    }
+  },
+  "export": {
+    "size": [
+      1080,
+      1080
+    ],
+    "pixelExact": true
+  },
+  "mobileOverflow": false,
+  "mobileGeometry": {
+    "reference": {
+      "aside": [
+        16,
+        570,
+        358,
+        762.78125
+      ],
+      ".stage": [
+        16,
+        72,
+        358,
+        358
+      ]
+    },
+    "actual": {
+      "aside": [
+        16,
+        518,
+        358,
+        657.59375
+      ],
+      ".stage": [
+        16,
+        72,
+        358,
+        358
+      ]
+    }
+  },
+  "idleRenders": 0,
+  "reference": "http://127.0.0.1:56894/",
+  "comparison": "Static Action, both renderers native 1080",
+  "nativeCanvas": [
+    [
+      1080,
+      1080
+    ],
+    [
+      1080,
+      1080
+    ]
+  ]
+}

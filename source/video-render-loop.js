@@ -18,14 +18,14 @@ O.useLayoutEffect(() => {
   lettersMotion.current.cells = [];
   lettersMotion.current.previousCells = [];
   lettersMotion.current.last = 0;
-  let renderSize = 600, renderScale = 1, renderMask = ribbonMask, lastWork = 0, lastRender = 0, renderTimer = 0;
+  let renderSize = 1080, renderScale = 1080 / 600, renderMask = stages.get("render-mask", [ribbonMask, 1080], () => gridResizeMask(ribbonMask, 1080)), lastWork = 0, lastRender = 0, renderTimer = 0;
   let videoFrame = -1;
   let at = 0, bt = null, Rt = false, oe = null, Me = null, dotPrepared = null;
   let Al = null, De = null, dotCells = [], firstRender = true;
   const qe = document.createElement("canvas"), work = document.createElement("canvas");
   qe.width = qe.height = work.width = work.height = renderSize;
   let frameSource = null, publishedTime = 0;
-  lettersMotion.current.scale = 1;
+  lettersMotion.current.scale = renderScale;
   let ga = performance.now(), fu = 0;
   const su = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const repaintDots = (time, moving) => {
@@ -46,7 +46,7 @@ O.useLayoutEffect(() => {
       const grid = stages.get("grid-path", [f, s, renderSize, renderScale], () => {
         const path = new Path2D();
         const dot = (left, top) => {
-          path.moveTo(left + 0.5, top); path.arc(left, top, 0.5 * renderScale, 0, Math.PI * 2);
+          path.moveTo(left + 0.5 * renderScale, top); path.arc(left, top, 0.5 * renderScale, 0, Math.PI * 2);
         };
         for (let column = 1; column < f; column++) {
           const left = Math.floor(column * renderSize / f) + 0.5;
@@ -103,7 +103,7 @@ O.useLayoutEffect(() => {
     if (qualityChanged) {
       renderSize = policy.size;
       renderScale = renderSize / 600;
-      renderMask = gridResizeMask(ribbonMask, renderSize);
+      renderMask = stages.get("render-mask", [ribbonMask, renderSize], () => gridResizeMask(ribbonMask, renderSize));
       for (const target of [work, qe]) if (target) {
         target.width = target.height = renderSize;
       }
@@ -152,13 +152,19 @@ O.useLayoutEffect(() => {
     bt = Je, Rt = true;
     const frameTime = videoSource ? Je?.currentTime || 0 : animatedImage ? El : 0;
     const rasterFrame = stages.get("raster", [Je, frameTime, renderSize, x], () => {
-      Mt.fillStyle = "#000", Mt.fillRect(0, 0, renderSize, renderSize), Mt.save(), Mt.translate(renderSize / 2, renderSize / 2), Mt.scale(x / 100, x / 100), Mt.translate(-renderSize / 2, -renderSize / 2);
+      // Isolate source rasterization from cell readbacks and image-load timing.
+      // Reusing the composition canvas can switch Chromium's drawing backend
+      // before a replacement image decodes, changing otherwise identical pixels.
+      const raster = document.createElement("canvas");
+      raster.width = raster.height = renderSize;
+      const rasterContext = raster.getContext("2d");
+      rasterContext.fillStyle = "#000", rasterContext.fillRect(0, 0, renderSize, renderSize), rasterContext.save(), rasterContext.translate(renderSize / 2, renderSize / 2), rasterContext.scale(x / 100, x / 100), rasterContext.translate(-renderSize / 2, -renderSize / 2);
       if (Je) {
         const fit = Math.min(renderSize / Je.naturalWidth, renderSize / Je.naturalHeight), width = Je.naturalWidth * fit, height = Je.naturalHeight * fit;
-        Mt.drawImage(Je, (renderSize - width) / 2, (renderSize - height) / 2, width, height);
+        rasterContext.drawImage(Je, (renderSize - width) / 2, (renderSize - height) / 2, width, height);
       }
-      Mt.restore();
-      return Mt.getImageData(0, 0, renderSize, renderSize);
+      rasterContext.restore();
+      return rasterContext.getImageData(0, 0, renderSize, renderSize);
     });
     const sourceFrame = stages.get("source", [rasterFrame, Y], () => {
       if (Y === 100) return rasterFrame;

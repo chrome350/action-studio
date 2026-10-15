@@ -5,7 +5,7 @@ for(const name of ['assets/index-BwYdjEfo.js','Grid Studio.html']){
  s=s.replace('U.jsx("div",{className:"brand",children:U.jsx("span",{children:"Grid Studio"})}),U.jsx("span",{className:"document-title",children:mediaName+" · 600 × 600 px"})','U.jsx("div",{className:"brand",children:U.jsx("img",{ref:Ke,className:"brand-logo",src:pb,alt:"AVITO ACTION",draggable:!1,style:{height:40,width:"auto",display:"block",opacity:1}})})');
  s=s.replace(/,U\.jsx\("img",\{ref:Ke,className:"stage-logo",src:pb,alt:"AVITO ACTION",draggable:!1,style:\{(?:opacity:\.5,)?top:`\$\{Qc\/600\*100\}%`,left:`\$\{Qc\/600\*100\}%`,height:`\$\{\$h\/600\*100\}%`\}\}\)/,'');
  s=s.replace('const oe=bt.width/600,Me=$h*oe;Rt.save();Rt.globalAlpha=.5;Rt.drawImage(at,Qc*oe,Qc*oe,Me*at.naturalWidth/at.naturalHeight,Me);Rt.restore();','');
- if(!s.includes('className:"brand-logo"'))throw Error('Missing header branding');
+ if(!s.includes('className:"brand-logo'))throw Error('Missing header branding');
  await fs.writeFile(file,s);
 }
 console.log('Opaque Avito Action logo moved to header; canvas and exports are unbranded.');

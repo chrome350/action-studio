@@ -1,0 +1,16 @@
+@font-face{font-family:AvitoSansText;src:url('../fonts/AvitoSansText-Regular.woff2');font-weight:400}
+@font-face{font-family:AvitoSansDisplay;src:url('../fonts/AvitoSansDisplay-Regular.woff');font-weight:400}
+dialog.ds-modal{box-sizing:border-box;width:440px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);margin:auto;padding:24px;border:1px solid #ffffff24;border-radius:16px;background:#272929;color:var(--ds-text);overflow:auto;font:400 10px/15px var(--ds-font-text)}
+dialog.ds-modal::backdrop{background:#030408cc;backdrop-filter:blur(10px)}
+dialog.ds-modal h2{margin:0 40px 20px 0;max-width:none;font:400 14px/20px AvitoSansDisplay,sans-serif;color:var(--ds-text)}
+dialog.ds-modal form{display:grid;gap:16px;margin:0}
+dialog.ds-modal input{box-sizing:border-box;width:100%;min-width:0;height:40px;margin:0;padding:0 12px;border:1px solid #ffffff20;border-radius:var(--ds-radius-control);background:var(--ds-field);color:var(--ds-text);font:400 10px/15px var(--ds-font-text)}
+dialog.ds-modal input:focus-visible{outline:2px solid var(--ds-focus);outline-offset:2px}
+dialog.ds-modal .ds-modal-close{position:absolute;right:16px;top:16px;display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;border-radius:9px;background:transparent;color:var(--ds-text)}
+dialog.ds-modal .ds-modal-close svg{width:16px;height:16px}
+dialog.ds-modal .ds-modal-close:hover{background:#ffffff0c}
+dialog.ds-modal .ds-modal-close:focus-visible{outline:2px solid var(--ds-focus);outline-offset:2px}
+dialog.ds-modal [role=alert]{margin:0;color:#ffa8b4;font:400 10px/15px var(--ds-font-text)}
+dialog.ds-modal [role=alert]:empty{display:none}
+dialog.ds-modal button[type=submit]{width:100%}
+@media(max-width:600px){dialog.ds-modal{padding:20px}dialog.ds-modal input{height:44px}dialog.ds-modal .ds-modal-close{width:36px;height:36px;right:12px;top:12px}}

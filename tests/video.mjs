@@ -12,7 +12,11 @@ for(const file of ['assets/index-BwYdjEfo.js','Grid Studio.html']){
  assert.ok(s.includes('accept:"image/*,video/*"'));
  assert.ok(s.includes('videoFrame=Je.currentTime;Rt=false;dotPrepared=null'),'video invalidates cached effects');
  assert.ok(s.includes('isVideo?source.currentTime:null'),'ribbons cache includes video time');
- assert.ok(s.includes('if(videoTools.isRecording())return;'),'space cannot interrupt recording');
+ const pauseGuard=s.match(/function cn\(\)\{if\((.*?)\)return;/)?.[1];
+ assert.ok(pauseGuard,'playback toggle has an early guard');
+ const guard=new Function('Ft','videoTools',`return (${pauseGuard})`);
+ assert.equal(guard({current:{}},{isRecording:()=>true}),true,'space cannot interrupt recording');
+ assert.equal(guard({current:{}},{isRecording:()=>false}),false,'space can toggle loaded media outside recording');
  assert.ok(s.includes('lettersMotion.current.previousCells=lettersMotion.current.cells'),'letter motion survives source frames');
 }
 console.log('Video: time, MIME negotiation, both builds, frame invalidation, ribbon and letter integration passed.');

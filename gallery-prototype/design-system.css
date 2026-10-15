@@ -1,0 +1,61 @@
+:root{
+ --ds-font-text:AvitoSansText,sans-serif;
+ --ds-font-number:AvitoSansTextMono,monospace;
+ --ds-label-size:10px;
+ --ds-input-size:10px;
+ --ds-text:#fff;
+ --ds-text-muted:#bcbcbc;
+ --ds-accent:#6500d8;
+ --ds-accent-hover:#760be8;
+ --ds-focus:#c98aff;
+ --ds-field:#222424;
+ --ds-control-height:34px;
+ --ds-radius-control:9px;
+ --ds-radius-pill:999px;
+ --ds-checkbox-gap:6px;
+ --ds-slider-label-width:63px;
+ --ds-slider-value-width:48px;
+ --ds-slider-gap:16px;
+ --ds-icon-size:16px;
+ --ds-icon-eye-size:18px;
+}
+
+
+/* The existing liquid button, shared by export, upload and future actions. */
+:is(.bottom-actions,.empty-stage,.ds-actions,.ds-modal,aside .panel-section) .liquid-button{
+ display:inline-flex;isolation:isolate;position:relative;overflow:hidden;
+ align-items:center;justify-content:center;gap:9px;height:40px;padding:0 20px;
+ border:0;border-radius:var(--ds-radius-pill);background:transparent;color:var(--ds-text);
+ font-family:var(--ds-font-text);font-size:12px;font-weight:400;line-height:16px;
+ cursor:pointer;box-shadow:0 2px 5px #0003,0 0 0 1px #0003;
+}
+:is(.bottom-actions,.empty-stage,.ds-actions,.ds-modal,aside .panel-section) .liquid-button-primary{background:var(--ds-accent)}
+:is(.bottom-actions,.empty-stage,.ds-actions,.ds-modal,aside .panel-section) .liquid-button-primary:hover{background:var(--ds-accent-hover)}
+.liquid-button:disabled{opacity:.4;cursor:default}
+.liquid-button:focus-visible{outline:2px solid var(--ds-focus);outline-offset:3px}
+.liquid-button svg{width:var(--ds-icon-size);height:var(--ds-icon-size)}
+.liquid-button-lens,.liquid-button-surface{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
+.liquid-button-lens{z-index:0;background:linear-gradient(150deg,#ffffff1c,#ffffff06 45%,#ffffff12);backdrop-filter:blur(4px) saturate(1.6)}
+.liquid-button-surface{z-index:1;background:linear-gradient(#ffffff18,#ffffff04 45%,#00000012);box-shadow:inset 0 1px 1px #ffffff8c,inset 1px 0 2px #ffffff40,inset -1px 0 2px #ffffff40,inset 0 -1px 1px #0009,inset 0 2px 5px #ffffff18,inset 0 -3px 6px #ffffff12}
+.liquid-button-content{position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;gap:inherit}
+@media(max-width:960px){:is(.bottom-actions,.empty-stage,.ds-actions,.ds-modal,aside .panel-section) .liquid-button{height:44px;padding:0 12px;gap:6px}}
+
+@font-face{font-family:AvitoSansText;src:url('../fonts/AvitoSansText-Regular.woff2');font-weight:400}
+@font-face{font-family:AvitoSansDisplay;src:url('../fonts/AvitoSansDisplay-Regular.woff');font-weight:400}
+dialog.ds-modal{box-sizing:border-box;width:440px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);margin:auto;padding:24px;border:1px solid #ffffff24;border-radius:16px;background:#272929;color:var(--ds-text);overflow:auto;font:400 10px/15px var(--ds-font-text)}
+dialog.ds-modal::backdrop{background:#030408cc;backdrop-filter:blur(10px)}
+dialog.ds-modal h2{margin:0 40px 20px 0;max-width:none;font:400 14px/20px AvitoSansDisplay,sans-serif;color:var(--ds-text)}
+dialog.ds-modal form{display:grid;gap:16px;margin:0}
+dialog.ds-modal input{box-sizing:border-box;width:100%;min-width:0;height:40px;margin:0;padding:0 12px;border:1px solid #ffffff20;border-radius:var(--ds-radius-control);background:var(--ds-field);color:var(--ds-text);font:400 10px/15px var(--ds-font-text)}
+dialog.ds-modal input:focus-visible{outline:2px solid var(--ds-focus);outline-offset:2px}
+dialog.ds-modal .ds-modal-close{position:absolute;right:16px;top:16px;display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;border-radius:9px;background:transparent;color:var(--ds-text)}
+dialog.ds-modal .ds-modal-close svg{width:16px;height:16px}
+dialog.ds-modal .ds-modal-close:hover{background:#ffffff0c}
+dialog.ds-modal .ds-modal-close:focus-visible{outline:2px solid var(--ds-focus);outline-offset:2px}
+dialog.ds-modal [role=alert]{margin:0;color:#ffa8b4;font:400 10px/15px var(--ds-font-text)}
+dialog.ds-modal [role=alert]:empty{display:none}
+dialog.ds-modal button[type=submit]{width:100%}
+@media(max-width:600px){dialog.ds-modal{padding:20px}dialog.ds-modal input{height:44px}dialog.ds-modal .ds-modal-close{width:36px;height:36px;right:12px;top:12px}}
+
+.ds-word-bubble{box-sizing:border-box;display:flex;align-items:center;justify-content:center;min-height:64px;padding:18px 20px;border:0;border-radius:999px;background:linear-gradient(160deg,#ffffff12,#ffffff03 45%,#00000012),#07131c;color:#c9edff;box-shadow:inset 0 0 2px #72ceff99,inset 0 0 7px #259cdbb3,inset 0 0 15px #1684bd80,0 3px 12px #0005;font:400 14px/20px AvitoSansDisplay,sans-serif;text-align:center;text-shadow:none;overflow-wrap:break-word;word-break:normal}
+.word-card.ds-word-bubble{width:190px;min-height:64px;padding:18px 20px;font:400 14px/20px AvitoSansDisplay,sans-serif;text-shadow:none;overflow-wrap:break-word}

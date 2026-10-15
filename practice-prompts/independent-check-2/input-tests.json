@@ -1,0 +1,62 @@
+[
+  {
+    "version": "raw",
+    "step": 1,
+    "empty": "25",
+    "during": "15 ячеек",
+    "after": "18 ячеек",
+    "rangeBefore": "300",
+    "rangeAfter": "300",
+    "errors": []
+  },
+  {
+    "version": "raw",
+    "step": 2,
+    "empty": "25",
+    "during": "15 ячеек",
+    "after": "18 ячеек",
+    "rangeBefore": "300",
+    "rangeAfter": "300",
+    "errors": []
+  },
+  {
+    "version": "raw",
+    "step": 3,
+    "empty": "25",
+    "during": "15 ячеек",
+    "after": "18 ячеек",
+    "rangeBefore": "300",
+    "rangeAfter": "300",
+    "errors": []
+  },
+  {
+    "version": "corrected/",
+    "step": 1,
+    "empty": "100",
+    "during": "36 ячеек",
+    "after": "18 ячеек",
+    "rangeBefore": "100",
+    "rangeAfter": "300",
+    "errors": []
+  },
+  {
+    "version": "corrected/",
+    "step": 2,
+    "empty": "100",
+    "during": "36 ячеек",
+    "after": "18 ячеек",
+    "rangeBefore": "100",
+    "rangeAfter": "300",
+    "errors": []
+  },
+  {
+    "version": "corrected/",
+    "step": 3,
+    "empty": "100",
+    "during": "36 ячеек",
+    "after": "18 ячеек",
+    "rangeBefore": "100",
+    "rangeAfter": "300",
+    "errors": []
+  }
+]

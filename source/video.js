@@ -26,6 +26,7 @@ function useGridVideo(url,kind,source,freeze,setFreeze,canvas,logo,overlay,logoX
   O.useLayoutEffect(()=>{
     const token=++generation.current;let disposed=false;
     setStatus({ready:false,time:0,duration:0,playing:false,error:''});setRecordError('');clearResult();
+    if(!url){source.current=null;return;}
     const media=kind==='video'?document.createElement('video'):new Image();source.current=media;
     if(kind!=='video'){
       media.gridAnimated=true;

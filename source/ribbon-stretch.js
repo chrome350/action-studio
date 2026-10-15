@@ -10,7 +10,7 @@ function nearestRibbonCoordinate(values,value) {
   // The original ascending reduce kept the smaller coordinate on equal distance.
   return value-values[low-1]<=values[low]-value?values[low-1]:values[low];
 }
-export function ribbonPixels(data, width, height, length=75, capture=8, bend=30, direction='left', mask=null) {
+export function ribbonPixels(data, width, height, length=75, capture=8, bend=30, direction='auto', mask=null) {
   const out=new Uint8ClampedArray(data);
   if(!mask || !length || !mask.some(v=>v)) return out;
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -20,23 +20,42 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
   for(let p=0;p<distance.length;p++)distance[p]=mask[p]>8?width+height:0;
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){const p=y*width+x;if(distance[p])distance[p]=Math.min(distance[p],x?distance[p-1]+1:1,y?distance[p-width]+1:1)}
   for(let y=height-1;y>=0;y--)for(let x=width-1;x>=0;x--){const p=y*width+x;if(distance[p])distance[p]=Math.min(distance[p],x<width-1?distance[p+1]+1:1,y<height-1?distance[p+width]+1:1)}
-  const sign=direction==='right'?1:-1;
   const reach=Math.max(1,width*clamp(length,0,100)/100);
   const band=Math.max(1,capture*width/600);
-  // Robust border colour, ignoring isolated stems that reach the frame edge.
+  // Exclude solid black fitting bars before estimating the photographic background.
+  const black=(x,y)=>{const i=(y*width+x)*4;return Math.max(data[i],data[i+1],data[i+2])<=2};
+  let left=0,right=width-1,topEdge=0,bottomEdge=height-1;
+  while(left<right && Array.from({length:height},(_,y)=>black(left,y)).every(Boolean))left++;
+  while(right>left && Array.from({length:height},(_,y)=>black(right,y)).every(Boolean))right--;
+  while(topEdge<bottomEdge && Array.from({length:width},(_,x)=>black(x,topEdge)).every(Boolean))topEdge++;
+  while(bottomEdge>topEdge && Array.from({length:width},(_,x)=>black(x,bottomEdge)).every(Boolean))bottomEdge--;
+  // A real black background can also have empty outer rows/columns. Only trim
+  // when the inner edges are predominantly nonblack (a fitted light photograph).
+  const nonblackColumn=x=>{let n=0;for(let y=topEdge;y<=bottomEdge;y++)n+=!black(x,y);return n/Math.max(1,bottomEdge-topEdge+1)};
+  if(right-left<width*.5 || bottomEdge-topEdge<height*.5 || nonblackColumn(left)<.85 || nonblackColumn(right)<.85){left=0;right=width-1;topEdge=0;bottomEdge=height-1;}
+  const median=a=>a.sort((a,b)=>a-b)[Math.floor(a.length/2)];
   const channels=[[],[],[]];
-  for(let y=0;y<height;y++)for(const x of [0,width-1])for(let c=0;c<3;c++)channels[c].push(data[(y*width+x)*4+c]);
-  for(let x=0;x<width;x++)for(const y of [0,height-1])for(let c=0;c<3;c++)channels[c].push(data[(y*width+x)*4+c]);
-  const bg=channels.map(a=>a.sort((a,b)=>a-b)[Math.floor(a.length/2)]);
+  for(let y=topEdge;y<=bottomEdge;y++)for(const x of [left,right])for(let c=0;c<3;c++)channels[c].push(data[(y*width+x)*4+c]);
+  const bg=channels.map(median);
   const foreground=new Float32Array(width*height);
-  for(let p=0;p<foreground.length;p++) {
-    const i=p*4, delta=Math.max(Math.abs(data[i]-bg[0]),Math.abs(data[i+1]-bg[1]),Math.abs(data[i+2]-bg[2]));
-    foreground[p]=smooth((delta-4)/18)*(data[i+3]/255);
+  for(let y=0;y<height;y++) {
+    // A short median window rejects isolated details on the border and follows
+    // vertical lighting gradients. Interpolation follows horizontal gradients.
+    const edges=[left,right].map(x=>[0,1,2].map(c=>{
+      const values=[];
+      for(let dy=-3;dy<=3;dy++){const yy=clamp(y+dy,topEdge,bottomEdge);values.push(data[(yy*width+x)*4+c]);}
+      return median(values);
+    }));
+    const consistent=Math.max(...edges[0].map((v,c)=>Math.abs(v-edges[1][c])))<60;
+    for(let x=0;x<width;x++) {
+      const p=y*width+x,i=p*4,t=clamp((x-left)/Math.max(1,right-left),0,1);
+      const expected=consistent?edges[0].map((v,c)=>v*(1-t)+edges[1][c]*t):bg;
+      const delta=Math.max(...expected.map((v,c)=>Math.abs(data[i+c]-v)));
+      foreground[p]=(x<left||x>right||y<topEdge||y>bottomEdge)?0:smooth((delta-4)/18)*(data[i+3]/255);
+    }
   }
   // Work in an oriented coordinate system: the ribbon always extends toward
   // decreasing u. The inner seam lies INSIDE the painted petal.
-  const flip=sign>0;
-  const pixel=(u,y)=>y*width+(flip?width-1-u:u);
   // Connected painted patches own separate surfaces, even at the same height.
   const visited=new Uint8Array(width*height),surfaces=[];
   for(let seed=0;seed<mask.length;seed++) {
@@ -44,10 +63,16 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
     const queue=[seed];visited[seed]=1;
     const rows=new Map();
     for(let q=0;q<queue.length;q++) {
-      const p=queue[q],x=p%width,y=Math.floor(p/width),u=flip?width-1-x:x;
+      const p=queue[q],x=p%width,y=Math.floor(p/width),u=x;
       if(foreground[p]>.35){const row=rows.get(y)||[];row.push(u);rows.set(y,row)}
       for(const n of [x>0?p-1:-1,x<width-1?p+1:-1,y>0?p-width:-1,y<height-1?p+width:-1])if(n>=0&&!visited[n]&&mask[n]>8){visited[n]=1;queue.push(n)}
     }
+    // Choose the nearest horizontal canvas edge independently for each patch.
+    // Use the selected foreground centroid so painted background cannot steer it.
+    let sumX=0,points=0;
+    for(const xs of rows.values())for(const x of xs){sumX+=x;points++;}
+    const flip=direction==='right'||(direction==='auto' && points>0 && sumX/points>(width-1)/2);
+    if(flip)for(const [y,xs] of rows)rows.set(y,xs.map(x=>width-1-x));
     const ys=[...rows.keys()].sort((a,b)=>a-b);if(ys.length<2)continue;
     const top=ys[0],bottom=ys[ys.length-1],raw=new Map();
     for(const y of ys){const xs=rows.get(y).sort((a,b)=>a-b),edge=xs[Math.floor((xs.length-1)*.08)],inner=xs[xs.length-1];raw.set(y,[edge+Math.min(inner-edge,Math.max(2,band)),Math.max(1,Math.min(inner-edge,Math.max(2,band)))])}
@@ -65,7 +90,7 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
       for(let k=-radius;k<=radius;k++){const w=radius+1-Math.abs(k),p=filled[clamp(i+k,0,filled.length-1)];a+=p[0]*w;b+=p[1]*w;weight+=w}
       fitted.push([a/weight,b/weight]);
     }
-    surfaces.push({top,bottom,fitted,ys,rows});
+    surfaces.push({top,bottom,fitted,ys,rows,flip});
   }
   const sample=(x,y)=>{
     x=clamp(x,0,width-1);y=clamp(y,0,height-1);
@@ -79,7 +104,8 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
     return [alpha?red/alpha:0,alpha?green/alpha:0,alpha?blue/alpha:0,alpha];
   };
   for(const surface of surfaces) {
-  const {top,bottom,fitted}=surface;
+  const {top,bottom,fitted,flip}=surface;
+  const pixel=(u,y)=>y*width+(flip?width-1-u:u);
   const center=(top+bottom)/2,span=Math.max(2,bottom-top);
   let count=0,sumU=0,sumY=0,sumUU=0,sumUY=0;
   for(const [y,xs] of surface.rows)for(const u of xs){count++;sumU+=u;sumY+=y;sumUU+=u*u;sumUY+=u*y}

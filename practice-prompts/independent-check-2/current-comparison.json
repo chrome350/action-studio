@@ -1,0 +1,156 @@
+{
+  "errors": [],
+  "comparisons": [
+    {
+      "name": "default",
+      "differentPixels": 647845,
+      "meanAbsoluteChannelError": 0.9186688385916781,
+      "maxDelta": 82
+    },
+    {
+      "name": "Интенсивность",
+      "differentPixels": 551469,
+      "meanAbsoluteChannelError": 0.877643747142204,
+      "maxDelta": 82
+    },
+    {
+      "name": "Свечение",
+      "differentPixels": 581587,
+      "meanAbsoluteChannelError": 0.8835542409693644,
+      "maxDelta": 82
+    },
+    {
+      "name": "Шлейф",
+      "differentPixels": 598840,
+      "meanAbsoluteChannelError": 0.8922659465020576,
+      "maxDelta": 82
+    },
+    {
+      "name": "Чёткая зона",
+      "differentPixels": 545075,
+      "meanAbsoluteChannelError": 1.190243198445359,
+      "maxDelta": 94
+    },
+    {
+      "name": "Масштаб",
+      "differentPixels": 780952,
+      "meanAbsoluteChannelError": 1.2772033607681756,
+      "maxDelta": 82
+    },
+    {
+      "name": "reset",
+      "differentPixels": 657700,
+      "meanAbsoluteChannelError": 0.9657473136716964,
+      "maxDelta": 82
+    },
+    {
+      "name": "grid hidden",
+      "differentPixels": 654192,
+      "meanAbsoluteChannelError": 0.8726760402377687,
+      "maxDelta": 65
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "disabledBeforeUpload": true,
+      "scaleChanges": true,
+      "resetExact": true,
+      "export": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "step": 2,
+      "disabledBeforeUpload": true,
+      "scaleChanges": true,
+      "resetExact": true,
+      "export": [
+        1080,
+        1080
+      ]
+    }
+  ],
+  "desktopGeometry": {
+    "reference": {
+      "aside": [
+        1124,
+        20,
+        300,
+        960
+      ],
+      ".stage": [
+        262,
+        202,
+        600,
+        600
+      ]
+    },
+    "actual": {
+      "aside": [
+        1124,
+        20,
+        300,
+        960
+      ],
+      ".stage": [
+        262,
+        202,
+        600,
+        600
+      ]
+    }
+  },
+  "export": {
+    "size": [
+      1080,
+      1080
+    ],
+    "pixelExact": false
+  },
+  "mobileOverflow": false,
+  "mobileGeometry": {
+    "reference": {
+      "aside": [
+        16,
+        570,
+        358,
+        764.28125
+      ],
+      ".stage": [
+        16,
+        72,
+        358,
+        358
+      ]
+    },
+    "actual": {
+      "aside": [
+        16,
+        536,
+        358,
+        743
+      ],
+      ".stage": [
+        16,
+        72,
+        358,
+        358
+      ]
+    }
+  },
+  "idleRenders": 0,
+  "reference": "Grid Studio.html",
+  "comparison": "Static Action, reference 600 scaled to 1080 using Canvas; actual native 1080",
+  "nativeCanvas": [
+    [
+      600,
+      600
+    ],
+    [
+      1080,
+      1080
+    ]
+  ]
+}

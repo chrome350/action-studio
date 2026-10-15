@@ -8,11 +8,11 @@ async function api(path,body){if(window.galleryCloud)return galleryCloud.request
 function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
 function renderMine(){const list=$('#my-list');list.replaceChildren();const statuses={pending:'На модерации',approved:'Опубликована',rejected:'Не одобрена'};for(const w of state.mine){const row=el('div',undefined,'submission-row');row.append(el('strong',w.title),el('span',statuses[w.status]));list.append(row)}if(!state.mine.length)list.append(el('p','Вы ещё не отправляли работы.'))}
 function renderState(next){state=next;const phase=state.settings.phase;
-$('#session-bar').hidden=phase!=='voting';$('#add-impression').hidden=phase!=='words';$('#vote-budget').textContent=phase==='voting'?`Лайки: ${state.votes.length} из 3`:'';
+$('#add-impression').hidden=phase!=='words';
 $('.upload').hidden=phase!=='upload';$('#empty').textContent=state.settings.liked?'Пока нет работ с лайками':'Здесь скоро появятся работы. Загрузите свою.';
 const shown=[...(phase==='upload'&&!state.settings.liked?starterWorks:[]),...state.works.filter(w=>!state.settings.liked||w.likes>0)];const words=state.words;
 const signature=JSON.stringify([shown.map(w=>[w.id,w.title,w.image]),words]);
-if(signature!==stateSignature){stateSignature=signature;transition=null;container.replaceChildren();items=[];shown.forEach(w=>add(w.image||'/api/image/'+w.id,w.title,w.starter?null:w));words.forEach(w=>{const b=el('div',w.text,'word-card');container.append(b);items.push({b,p:null})});stage.classList.toggle('grid',grid);$('#empty').hidden=items.length>0}
+if(signature!==stateSignature){stateSignature=signature;transition=null;container.replaceChildren();items=[];shown.forEach(w=>add(w.image||'/api/image/'+w.id,w.title,w.starter?null:w));words.forEach(w=>{const b=el('div',w.text,'word-card ds-word-bubble');container.append(b);items.push({b,p:null})});stage.classList.toggle('grid',grid);$('#empty').hidden=items.length>0}
 renderMine();if(selectedWork&&$('#detail').open)renderWork(selectedWork);}
 let votePending=false;
 function renderWork(work){
@@ -72,4 +72,15 @@ $('#submit-form').onsubmit=async e=>{e.preventDefault();const form=e.target,butt
 (async()=>{try{participant=localStorage.getItem(participantKey)||'';if(window.galleryCloud||!participant){participant=(await api('join',{})).token;localStorage.setItem(participantKey,participant)}await refresh();apiReady=true;setInterval(()=>{if(!document.hidden&&!$('#work-actions input:focus'))refresh().catch(()=>{})},2500)}catch(e){if(window.galleryCloud){$('#empty').hidden=items.length>0;$('#empty').textContent='Не удалось подключиться к галерее. Обновите страницу.';console.error(e)}}})();
 
 $('#add-impression').onclick=()=>$('#impression-dialog').showModal();
-$('#impression-form').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;$('#impression-error').textContent='';try{await api('words',{text:$('#impression-text').value});e.target.reset();$('#impression-dialog').close();toast('Ответ отправлен');await refresh()}catch(err){$('#impression-error').textContent=err.message}finally{button.disabled=false}};
+$('#impression-form').onsubmit=async e=>{
+ e.preventDefault();const form=e.target,button=form.querySelector('button');
+ const entries=[...form.querySelectorAll('input[name="impression"]')].map(input=>({input,text:input.value.trim().replace(/\s+/g,' ')})).filter(entry=>entry.text);
+ const error=$('#impression-error');error.textContent='';
+ if(!entries.length){error.textContent='Заполните хотя бы одно поле.';return}
+ const invalid=entries.find(entry=>entry.text.length>60);
+ if(invalid){error.textContent='В каждом поле — до 60 символов.';invalid.input.focus();return}
+ button.disabled=true;let sent=0;
+ try{for(const entry of entries){await api('words',{text:entry.text});entry.input.value='';sent++}form.reset();$('#impression-dialog').close();toast('Ответ отправлен');await refresh()}
+ catch(err){error.textContent=(sent?'Часть ответа уже отправлена. Повторите отправку оставшихся полей. ':'')+err.message}
+ finally{button.disabled=false}
+};

@@ -57,7 +57,7 @@ begin
  elsif action='words' then
   if cfg.phase<>'words' then raise exception 'Сбор впечатлений сейчас закрыт'; end if;
   answer:=trim(regexp_replace(coalesce(payload->>'text',''),'\s+',' ','g'));
-  if char_length(answer) not between 1 and 60 or cardinality(string_to_array(answer,' '))>3 then raise exception 'Напишите от одного до трёх слов'; end if;
+  if char_length(answer) not between 1 and 60 then raise exception 'Напишите от 1 до 60 символов.'; end if;
   if (select count(*) from gallery_private.words where person=uid)>=20 then raise exception 'Вы уже отправили 20 ответов'; end if;
   insert into gallery_private.words(person,text) values(uid,answer);
  elsif action like 'admin%' then
