@@ -1,0 +1,885 @@
+{
+  "text": "Свойства\nСетка\n36 ячеек\nЦвет линий\n%\nКолонки\nРяды\nИзображение\nМасштаб\n%\nЯркость\n%\nКонтраст\n%\nЭффект\nRibbons\nDot Matrix\nAction\nLetters\nСвечение\npx\nАнимация свечения\nСкорость\n%\nИнтенсивность\n%\nШлейф\npx\nЧёткая зона\n%",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "type": "submit",
+      "role": null,
+      "label": "Случайный цикл",
+      "text": "Случайный циклЦикл",
+      "amin": null,
+      "amax": null,
+      "value": ""
+    },
+    {
+      "tag": "BUTTON",
+      "type": "submit",
+      "role": null,
+      "label": null,
+      "text": " Стоп кадр",
+      "amin": null,
+      "amax": null,
+      "value": ""
+    },
+    {
+      "tag": "BUTTON",
+      "type": "submit",
+      "role": null,
+      "label": null,
+      "text": " Скачать PNG",
+      "amin": null,
+      "amax": null,
+      "value": ""
+    },
+    {
+      "tag": "BUTTON",
+      "type": "submit",
+      "role": null,
+      "label": "Сбросить настройки",
+      "text": "",
+      "amin": null,
+      "amax": null,
+      "value": ""
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "role": null,
+      "label": "Цвет линий",
+      "text": "",
+      "amin": null,
+      "amax": null,
+      "value": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "role": null,
+      "label": "HEX цвета линий",
+      "text": null,
+      "min": "",
+      "max": "",
+      "amin": null,
+      "amax": null,
+      "value": "FFFFFF",
+      "checked": false
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": "Непрозрачность линий",
+      "text": null,
+      "min": "0",
+      "max": "100",
+      "amin": null,
+      "amax": null,
+      "value": "45",
+      "checked": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "role": null,
+      "label": "Скрыть сетку",
+      "text": "",
+      "amin": null,
+      "amax": null,
+      "value": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": null,
+      "text": null,
+      "min": "1",
+      "max": "10",
+      "amin": null,
+      "amax": null,
+      "value": "6",
+      "checked": false
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": null,
+      "text": null,
+      "min": "1",
+      "max": "10",
+      "amin": null,
+      "amax": null,
+      "value": "6",
+      "checked": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "role": null,
+      "label": "Загрузить изображение или видео",
+      "text": "",
+      "amin": null,
+      "amax": null,
+      "value": ""
+    },
+    {
+      "tag": "SPAN",
+      "role": "slider",
+      "label": null,
+      "text": null,
+      "amin": "25",
+      "amax": "200"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": "Масштаб — значение",
+      "text": null,
+      "min": "25",
+      "max": "200",
+      "amin": null,
+      "amax": null,
+      "value": "100",
+      "checked": false
+    },
+    {
+      "tag": "SPAN",
+      "role": "slider",
+      "label": null,
+      "text": null,
+      "amin": "0",
+      "amax": "200"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": "Яркость — значение",
+      "text": null,
+      "min": "0",
+      "max": "200",
+      "amin": null,
+      "amax": null,
+      "value": "100",
+      "checked": false
+    },
+    {
+      "tag": "SPAN",
+      "role": "slider",
+      "label": null,
+      "text": null,
+      "amin": "0",
+      "amax": "300"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": "Контраст — значение",
+      "text": null,
+      "min": "0",
+      "max": "300",
+      "amin": null,
+      "amax": null,
+      "value": "100",
+      "checked": false
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "role": null,
+      "label": "Режим эффекта",
+      "text": null,
+      "amin": null,
+      "amax": null,
+      "value": "clean"
+    },
+    {
+      "tag": "SPAN",
+      "role": "slider",
+      "label": null,
+      "text": null,
+      "amin": "2",
+      "amax": "60"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": "Свечение — значение",
+      "text": null,
+      "min": "2",
+      "max": "60",
+      "amin": null,
+      "amax": null,
+      "value": "24",
+      "checked": false
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "role": null,
+      "label": null,
+      "text": null,
+      "min": "",
+      "max": "",
+      "amin": null,
+      "amax": null,
+      "value": "on",
+      "checked": true
+    },
+    {
+      "tag": "SPAN",
+      "role": "slider",
+      "label": null,
+      "text": null,
+      "amin": "25",
+      "amax": "200"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": "Скорость — значение",
+      "text": null,
+      "min": "25",
+      "max": "200",
+      "amin": null,
+      "amax": null,
+      "value": "100",
+      "checked": false
+    },
+    {
+      "tag": "SPAN",
+      "role": "slider",
+      "label": null,
+      "text": null,
+      "amin": "0",
+      "amax": "100"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": "Интенсивность — значение",
+      "text": null,
+      "min": "0",
+      "max": "100",
+      "amin": null,
+      "amax": null,
+      "value": "80",
+      "checked": false
+    },
+    {
+      "tag": "SPAN",
+      "role": "slider",
+      "label": null,
+      "text": null,
+      "amin": "0",
+      "amax": "40"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": "Шлейф — значение",
+      "text": null,
+      "min": "0",
+      "max": "40",
+      "amin": null,
+      "amax": null,
+      "value": "16",
+      "checked": false
+    },
+    {
+      "tag": "SPAN",
+      "role": "slider",
+      "label": null,
+      "text": null,
+      "amin": "0",
+      "amax": "100"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "role": null,
+      "label": "Чёткая зона — значение",
+      "text": null,
+      "min": "0",
+      "max": "100",
+      "amin": null,
+      "amax": null,
+      "value": "16",
+      "checked": false
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "role": null,
+      "label": null,
+      "text": null,
+      "min": "",
+      "max": "",
+      "amin": null,
+      "amax": null,
+      "value": "",
+      "checked": false
+    }
+  ],
+  "layouts": [
+    {
+      "size": {
+        "width": 1440,
+        "height": 1000
+      },
+      "items": [
+        {
+          "tag": "HEADER",
+          "cls": "",
+          "text": null,
+          "box": [
+            0,
+            0,
+            1440,
+            72
+          ],
+          "padding": "20px 340px 12px 20px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgb(29, 29, 29)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "DIV",
+          "cls": "stage",
+          "text": null,
+          "box": [
+            262,
+            202,
+            600,
+            600
+          ],
+          "padding": "0px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "40px"
+        },
+        {
+          "tag": "DIV",
+          "cls": "bottom-actions",
+          "text": null,
+          "box": [
+            335.3671875,
+            924,
+            453.265625,
+            52
+          ],
+          "padding": "6px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgb(41, 41, 41)",
+          "gap": "8px",
+          "borderRadius": "999px"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "",
+          "text": null,
+          "box": [
+            1124,
+            20,
+            300,
+            960
+          ],
+          "padding": "0px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(41, 43, 43, 0.937)",
+          "gap": "normal",
+          "borderRadius": "24px"
+        },
+        {
+          "tag": "DIV",
+          "cls": "panel-title",
+          "text": null,
+          "box": [
+            1124,
+            20,
+            300,
+            56
+          ],
+          "padding": "12px 14px 0px",
+          "font": "600 14px / 18.2px AvitoSansText, sans-serif",
+          "bg": "rgb(41, 43, 43)",
+          "gap": "12px",
+          "borderRadius": "23px 23px 0px 0px"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "panel-section",
+          "text": null,
+          "box": [
+            1124,
+            76,
+            300,
+            180.078125
+          ],
+          "padding": "16.9px 14px 12px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "H2",
+          "cls": "",
+          "text": " Сетка 36 ячеек",
+          "box": [
+            1138,
+            92.890625,
+            272,
+            18.1875
+          ],
+          "padding": "0px",
+          "font": "13px / 18.2px AvitoSansDisplay, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "8px",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "panel-section",
+          "text": null,
+          "box": [
+            1124,
+            256.078125,
+            300,
+            178
+          ],
+          "padding": "12px 14px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "H2",
+          "cls": "image-heading",
+          "text": " Изображение",
+          "box": [
+            1138,
+            268.078125,
+            272,
+            28
+          ],
+          "padding": "0px",
+          "font": "13px / 18.2px AvitoSansDisplay, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "8px",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "panel-section",
+          "text": null,
+          "box": [
+            1124,
+            434.078125,
+            300,
+            302
+          ],
+          "padding": "12px 14px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "H2",
+          "cls": "",
+          "text": " Эффект",
+          "box": [
+            1138,
+            452.984375,
+            50.734375,
+            18.1875
+          ],
+          "padding": "0px",
+          "font": "13px / 18.2px AvitoSansDisplay, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "8px",
+          "borderRadius": "0px"
+        }
+      ]
+    },
+    {
+      "size": {
+        "width": 1440,
+        "height": 760
+      },
+      "items": [
+        {
+          "tag": "HEADER",
+          "cls": "",
+          "text": null,
+          "box": [
+            0,
+            0,
+            1440,
+            72
+          ],
+          "padding": "20px 340px 12px 20px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgb(29, 29, 29)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "DIV",
+          "cls": "stage",
+          "text": null,
+          "box": [
+            262,
+            72,
+            600,
+            600
+          ],
+          "padding": "0px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "40px"
+        },
+        {
+          "tag": "DIV",
+          "cls": "bottom-actions",
+          "text": null,
+          "box": [
+            335.3671875,
+            684,
+            453.265625,
+            52
+          ],
+          "padding": "6px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgb(41, 41, 41)",
+          "gap": "8px",
+          "borderRadius": "999px"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "",
+          "text": null,
+          "box": [
+            1124,
+            20,
+            300,
+            720
+          ],
+          "padding": "0px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(41, 43, 43, 0.937)",
+          "gap": "normal",
+          "borderRadius": "24px"
+        },
+        {
+          "tag": "DIV",
+          "cls": "panel-title",
+          "text": null,
+          "box": [
+            1124,
+            20,
+            300,
+            56
+          ],
+          "padding": "12px 14px 0px",
+          "font": "600 14px / 18.2px AvitoSansText, sans-serif",
+          "bg": "rgb(41, 43, 43)",
+          "gap": "12px",
+          "borderRadius": "23px 23px 0px 0px"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "panel-section",
+          "text": null,
+          "box": [
+            1124,
+            76,
+            300,
+            180.078125
+          ],
+          "padding": "16.9px 14px 12px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "H2",
+          "cls": "",
+          "text": " Сетка 36 ячеек",
+          "box": [
+            1138,
+            92.890625,
+            272,
+            18.1875
+          ],
+          "padding": "0px",
+          "font": "13px / 18.2px AvitoSansDisplay, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "8px",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "panel-section",
+          "text": null,
+          "box": [
+            1124,
+            256.078125,
+            300,
+            178
+          ],
+          "padding": "12px 14px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "H2",
+          "cls": "image-heading",
+          "text": " Изображение",
+          "box": [
+            1138,
+            268.078125,
+            272,
+            28
+          ],
+          "padding": "0px",
+          "font": "13px / 18.2px AvitoSansDisplay, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "8px",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "panel-section",
+          "text": null,
+          "box": [
+            1124,
+            434.078125,
+            300,
+            302
+          ],
+          "padding": "12px 14px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "H2",
+          "cls": "",
+          "text": " Эффект",
+          "box": [
+            1138,
+            452.984375,
+            50.734375,
+            18.1875
+          ],
+          "padding": "0px",
+          "font": "13px / 18.2px AvitoSansDisplay, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "8px",
+          "borderRadius": "0px"
+        }
+      ]
+    },
+    {
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "items": [
+        {
+          "tag": "HEADER",
+          "cls": "",
+          "text": null,
+          "box": [
+            0,
+            0,
+            390,
+            72
+          ],
+          "padding": "16px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgb(29, 29, 29)",
+          "gap": "4px",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "DIV",
+          "cls": "stage",
+          "text": null,
+          "box": [
+            16,
+            72,
+            358,
+            358
+          ],
+          "padding": "0px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "23.4px"
+        },
+        {
+          "tag": "DIV",
+          "cls": "bottom-actions",
+          "text": null,
+          "box": [
+            16,
+            442,
+            358,
+            108
+          ],
+          "padding": "6px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgb(41, 41, 41)",
+          "gap": "8px",
+          "borderRadius": "24px"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "",
+          "text": null,
+          "box": [
+            16,
+            570,
+            358,
+            888.28125
+          ],
+          "padding": "0px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(41, 43, 43, 0.937)",
+          "gap": "normal",
+          "borderRadius": "24px"
+        },
+        {
+          "tag": "DIV",
+          "cls": "panel-title",
+          "text": null,
+          "box": [
+            16,
+            570,
+            358,
+            64
+          ],
+          "padding": "12px 16px 0px",
+          "font": "600 14px / 18.2px AvitoSansText, sans-serif",
+          "bg": "rgb(41, 43, 43)",
+          "gap": "12px",
+          "borderRadius": "23px 23px 0px 0px"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "panel-section",
+          "text": null,
+          "box": [
+            16,
+            634,
+            358,
+            208.28125
+          ],
+          "padding": "28.2px 16px 16px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "H2",
+          "cls": "",
+          "text": " Сетка 36 ячеек",
+          "box": [
+            32,
+            662.1875,
+            326,
+            19.59375
+          ],
+          "padding": "0px",
+          "font": "14px / 19.6px AvitoSansDisplay, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "8px",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "panel-section",
+          "text": null,
+          "box": [
+            16,
+            842.28125,
+            358,
+            232
+          ],
+          "padding": "16px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "H2",
+          "cls": "image-heading",
+          "text": " Изображение",
+          "box": [
+            32,
+            858.28125,
+            326,
+            44
+          ],
+          "padding": "0px",
+          "font": "14px / 19.6px AvitoSansDisplay, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "8px",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "panel-section",
+          "text": null,
+          "box": [
+            16,
+            1074.28125,
+            358,
+            384
+          ],
+          "padding": "16px",
+          "font": "11px / 16.5px AvitoSansText, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "normal",
+          "borderRadius": "0px"
+        },
+        {
+          "tag": "H2",
+          "cls": "",
+          "text": " Эффект",
+          "box": [
+            32,
+            1102.484375,
+            54.640625,
+            19.59375
+          ],
+          "padding": "0px",
+          "font": "14px / 19.6px AvitoSansDisplay, sans-serif",
+          "bg": "rgba(0, 0, 0, 0)",
+          "gap": "8px",
+          "borderRadius": "0px"
+        }
+      ]
+    }
+  ]
+}
