@@ -68,7 +68,7 @@ class Handler(SimpleHTTPRequestHandler):
             # Serve only gallery UI and its fonts. Never serve database, source, or keys.
             if path in ('/','/gallery-prototype'): self.send_response(302);self.send_header('Location','/gallery-prototype/');self.end_headers();return
             resolved=(ROOT / path.lstrip('/')).resolve()
-            allowed=(resolved==ROOT/'gallery-prototype' or (resolved.is_relative_to(ROOT/'gallery-prototype') and resolved.suffix in ('.html','.css','.js','.svg','.png')) or (resolved.is_relative_to(ROOT/'fonts') and resolved.suffix in ('.woff','.woff2')))
+            allowed=(resolved==ROOT/'gallery-prototype' or (resolved.is_relative_to(ROOT/'gallery-prototype') and resolved.suffix in ('.html','.css','.js','.svg','.png','.jpg','.webp')) or (resolved.is_relative_to(ROOT/'fonts') and resolved.suffix in ('.woff','.woff2')))
             if not allowed or '.local-data' in resolved.parts: raise Error('Не найдено.',404)
             return super().do_GET()
         except Error as e:self.reply({'error':e.message},e.status)

@@ -1,4 +1,6 @@
 let participant='', state=null, stateSignature='', selectedWork=null, uploadData='', apiReady=false, drafts={};
+const starterWorks=Array.from({length:7},(_,i)=>({id:'starter-'+(i+1),title:'Стартовая работа '+(i+1),image:'assets/starters/frame-'+(i+1)+'.jpg',starter:true}));
+starterWorks.forEach(w=>add(w.image,w.title));
 const profile=new URLSearchParams(location.search).get('participant')||'default';
 const participantKey='action-gallery-participant-'+profile;
 function toast(text){$('#toast').textContent=text;$('#toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').hidden=true,4500)}
@@ -8,13 +10,13 @@ function renderMine(){const list=$('#my-list');list.replaceChildren();const stat
 function renderState(next){state=next;const phase=state.settings.phase;
 $('#session-bar').hidden=phase!=='voting';$('#add-impression').hidden=phase!=='words';$('#vote-budget').textContent=phase==='voting'?`Лайки: ${state.votes.length} из 3`:'';
 $('.upload').hidden=phase!=='upload';$('#empty').textContent=state.settings.liked?'Пока нет работ с лайками':'Здесь скоро появятся работы. Загрузите свою.';
-const shown=state.works.filter(w=>!state.settings.liked||w.likes>0);const words=state.words;
+const shown=[...(phase==='upload'&&!state.settings.liked?starterWorks:[]),...state.works.filter(w=>!state.settings.liked||w.likes>0)];const words=state.words;
 const signature=JSON.stringify([shown.map(w=>[w.id,w.title,w.image]),words]);
-if(signature!==stateSignature){stateSignature=signature;transition=null;container.replaceChildren();items=[];shown.forEach(w=>add(w.image||'/api/image/'+w.id,w.title,w));words.forEach(w=>{const b=el('div',w.text,'word-card');container.append(b);items.push({b,p:null})});stage.classList.toggle('grid',grid);$('#empty').hidden=items.length>0}
+if(signature!==stateSignature){stateSignature=signature;transition=null;container.replaceChildren();items=[];shown.forEach(w=>add(w.image||'/api/image/'+w.id,w.title,w.starter?null:w));words.forEach(w=>{const b=el('div',w.text,'word-card');container.append(b);items.push({b,p:null})});stage.classList.toggle('grid',grid);$('#empty').hidden=items.length>0}
 renderMine();if(selectedWork&&$('#detail').open)renderWork(selectedWork);}
 function renderWork(work){selectedWork=state.works.find(w=>w.id===work.id);const box=$('#work-actions');box.replaceChildren();if(!selectedWork){$('#detail').close();return}work=selectedWork;box.append(el('h2',work.title),el('p',work.author));const phase=state.settings.phase;const liked=state.votes.includes(work.id);const vote=el('button',`${liked?'♥':'♡'} ${work.likes} · ${liked?'Нравится':'Нравится?'}`);vote.setAttribute('aria-pressed',String(liked));vote.disabled=phase!=='voting';vote.onclick=async()=>{vote.disabled=true;try{await api('vote',{id:work.id,liked:!liked});await refresh()}catch(e){toast(e.message)}finally{if(vote.isConnected)vote.disabled=phase!=='voting'}};if(phase!=='upload')box.append(vote);
 }
-window.openWork=work=>{if(work)renderWork(work)};
+window.openWork=work=>{selectedWork=null;$('#work-actions').replaceChildren();if(work)renderWork(work)};
 async function refresh(){renderState(await api('state'))}
 $('.upload').onclick=()=>{if(!apiReady){toast('Откройте рабочую галерею на порту 8767.');return}$('#submission').showModal()};$('.upload').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('.upload').click()}};
 $('.upload').removeAttribute('for');document.querySelectorAll('.dialog-close').forEach(b=>b.onclick=()=>b.closest('dialog').close());
@@ -27,7 +29,7 @@ for(const type of ['dragleave','drop'])dropZone.addEventListener(type,e=>{e.prev
 dropZone.addEventListener('drop',e=>{if(e.dataTransfer.files.length!==1){$('#submit-error').textContent='Перетащите одно изображение.';return}loadFile(e.dataTransfer.files[0])});
 $('#submission').addEventListener('dragover',e=>e.preventDefault());$('#submission').addEventListener('drop',e=>e.preventDefault());
 $('#submit-form').onsubmit=async e=>{e.preventDefault();const form=e.target,button=form.querySelector('button');if(!uploadData){$('#submit-error').textContent='Дождитесь загрузки изображения.';return}button.disabled=true;$('#submit-error').textContent='';try{await api('submit',{image:uploadData.split(',')[1]});form.reset();uploadData='';$('#upload-preview').hidden=true;$('#submission').close();toast('Работа отправлена на модерацию');await refresh()}catch(err){$('#submit-error').textContent=err.message}finally{button.disabled=false}};
-(async()=>{try{participant=localStorage.getItem(participantKey)||'';if(window.galleryCloud||!participant){participant=(await api('join',{})).token;localStorage.setItem(participantKey,participant)}await refresh();apiReady=true;setInterval(()=>{if(!document.hidden&&!$('#work-actions input:focus'))refresh().catch(()=>{})},2500)}catch(e){if(window.galleryCloud){$('#empty').hidden=false;$('#empty').textContent='Не удалось подключиться к галерее. Обновите страницу.';console.error(e)}else names.forEach((n,i)=>add(art(i),n))}})();
+(async()=>{try{participant=localStorage.getItem(participantKey)||'';if(window.galleryCloud||!participant){participant=(await api('join',{})).token;localStorage.setItem(participantKey,participant)}await refresh();apiReady=true;setInterval(()=>{if(!document.hidden&&!$('#work-actions input:focus'))refresh().catch(()=>{})},2500)}catch(e){if(window.galleryCloud){$('#empty').hidden=items.length>0;$('#empty').textContent='Не удалось подключиться к галерее. Обновите страницу.';console.error(e)}}})();
 
 $('#add-impression').onclick=()=>$('#impression-dialog').showModal();
 $('#impression-form').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;$('#impression-error').textContent='';try{await api('words',{text:$('#impression-text').value});e.target.reset();$('#impression-dialog').close();toast('Ответ отправлен');await refresh()}catch(err){$('#impression-error').textContent=err.message}finally{button.disabled=false}};
