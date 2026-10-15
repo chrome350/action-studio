@@ -32,7 +32,20 @@ control.append(button,count);box.append(control);
 }
 const vote=control.querySelector('button'),count=control.querySelector('.like-count');
 vote.setAttribute('aria-label',liked?'Убрать лайк':'Поставить лайк');vote.setAttribute('aria-pressed',String(liked));vote.disabled=phase!=='voting'||votePending;
-if(count.textContent!==String(work.likes))count.textContent=work.likes;
+const nextCount=String(work.likes);
+if(count.dataset.value!==nextCount){
+count.dataset.value=nextCount;
+if(!count.textContent||matchMedia('(prefers-reduced-motion: reduce)').matches){count.textContent=nextCount}
+else{
+count.getAnimations().forEach(a=>a.cancel());
+const fade=count.animate([{opacity:1},{opacity:0}],{duration:140,fill:'forwards',easing:'ease-out'});
+fade.finished.then(()=>{
+if(count.dataset.value!==nextCount)return;
+count.textContent=nextCount;fade.cancel();
+count.animate([{opacity:0},{opacity:1}],{duration:180,easing:'ease-in'});
+}).catch(()=>{});
+}
+}
 vote.onclick=async()=>{
 if(votePending)return;
 votePending=true;vote.disabled=true;

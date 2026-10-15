@@ -41,14 +41,12 @@ dialog button[type=submit],#work-actions>button,.admin-wrap button{border:0;bord
 .like-button:active{transform:scale(.9)}
 .like-button:focus-visible{outline:2px solid #bfaaff;outline-offset:5px}
 .like-button:disabled{opacity:1;cursor:default;transform:none}
-.like-count{min-width:2ch;font:400 13px/1.4 Display,Arial;font-variant-numeric:tabular-nums;color:#f5f5f7}
+.like-count{width:3ch;text-align:left;font:400 13px/1.4 Display,Arial;font-variant-numeric:tabular-nums;color:#f5f5f7}
 .like-pop .like-button{animation:like-bounce .6s cubic-bezier(.22,.68,.3,1)}
-.like-pop .like-button svg{animation:like-heart .6s ease-out}
-.like-pop .like-count{animation:like-number .35s ease-out}
+
+
 @keyframes like-bounce{0%{transform:scale(.88)}35%{transform:translateY(-10px) scale(1.08)}65%{transform:translateY(2px) scale(.97)}85%{transform:translateY(-3px) scale(1.02)}100%{transform:none}}
-@keyframes like-heart{0%{transform:scale(.75)}40%{transform:scale(1.18)}70%{transform:scale(.94)}100%{transform:scale(1)}}
-@keyframes like-number{from{opacity:.35;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){.like-button{transition:none}.like-pop .like-button,.like-pop .like-button svg,.like-pop .like-count{animation:none}}
+@media(prefers-reduced-motion:reduce){.like-button{transition:none}.like-pop .like-button{animation:none}}
 
 @media(max-width:960px){.like-count{font-size:14px}}
 /* Match the artwork viewer to the gallery card frame. */
