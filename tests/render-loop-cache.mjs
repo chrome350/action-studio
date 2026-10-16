@@ -69,6 +69,7 @@ function harness(overrides = {}) {
     createGridRenderCache, createGridRenderGate, gridVideoPolicy, gridResizeMask, gridPublishVideoFrame,
     createGridEffectWorker: () => ({ available: false, status: 'disabled', run: () => Promise.resolve(null), invalidate() {}, dispose() {} }),
     gridForegroundForEffects: data => data,
+    gridRemovePaperGlow: data => data,
     gridAdaptiveTone() { counts.tone++; return {}; },
     gb() { counts.action++; return {}; },
     yb() { counts.actionDraw++; }, hb() { counts.cellMaskBlur=(counts.cellMaskBlur||0)+1; },

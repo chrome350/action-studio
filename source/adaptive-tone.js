@@ -118,3 +118,13 @@ export function gridForegroundForEffects(data,width,height,bounds=null,metadata=
  if(metadata){metadata.background=backdrop;metadata.lightMode=light>=.55||(light>.32&&brightEdge>.65);}
  return out;
 }
+
+/** Remove only the filter response of empty paper, using the same finished
+ * static/animated frame as the subject. No luminance inversion or hard mask. */
+export function gridRemovePaperGlow(frame,reference,paper){
+ for(let i=0;i<frame.length;i+=4){
+  for(let c=0;c<3;c++)frame[i+c]=Math.max(0,Math.min(255,paper[i+c]+frame[i+c]-reference[i+c]));
+  frame[i+3]=255;
+ }
+ return frame;
+}

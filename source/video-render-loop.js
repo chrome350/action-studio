@@ -24,7 +24,8 @@ O.useLayoutEffect(() => {
   let Al = null, De = null, dotCells = [], firstRender = true;
   const qe = document.createElement("canvas"), work = document.createElement("canvas");
   qe.width = qe.height = work.width = work.height = renderSize;
-  let frameSource = null, publishedTime = 0, transparentForeground=false,effectBackdrop=null,hasTransparentLetters=false,sharedGlow=null;
+  let frameSource = null, publishedTime = 0, transparentForeground=false,effectBackdrop=null,hasTransparentLetters=false,sharedGlow=null,sharedPaperPixels=null;
+  const paperReference=document.createElement("canvas");paperReference.width=paperReference.height=renderSize;
   lettersMotion.current.scale = renderScale;
   let ga = performance.now(), fu = 0;
   const su = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -39,13 +40,20 @@ O.useLayoutEffect(() => {
   };
   const Ae = (Mt) => {
     if(sharedGlow&&effectBackdrop){
-      const paper=effectBackdrop.getContext("2d");paper.clearRect(0,0,renderSize,renderSize);
+      const paper=paperReference.getContext("2d");paper.clearRect(0,0,renderSize,renderSize);
       yb(paper,sharedGlow,su||!actionAnimate?null:y.current,Q,Lt);
       Mt.drawImage(effectBackdrop,0,0);
     }
     if (Mt.drawImage(Al, 0, 0), oe && Me) {
       const Wt = qe.getContext("2d");
-      Wt.clearRect(0, 0, renderSize, renderSize), yb(Wt, oe, su || !actionAnimate ? null : y.current, Q, Lt), Wt.globalCompositeOperation = "destination-in", Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
+      Wt.clearRect(0,0,renderSize,renderSize);yb(Wt,oe,su||!actionAnimate?null:y.current,Q,Lt);
+      if(sharedGlow){
+        const frame=Wt.getImageData(0,0,renderSize,renderSize);
+        const reference=paperReference.getContext("2d").getImageData(0,0,renderSize,renderSize);
+        gridRemovePaperGlow(frame.data,reference.data,sharedPaperPixels);
+        Wt.putImageData(frame,0,0);
+      }
+      Wt.globalCompositeOperation = "destination-in", Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
     }
     drawLettersInteraction(Mt, lettersMotion.current, lettersInteractive, lettersRadius, lettersStrength, su, performance.now(), v, _e.current);
     if (v && b > 0) {
@@ -194,6 +202,11 @@ O.useLayoutEffect(() => {
     });
     const adaptedForeground=foregroundFrame!==rasterFrame;
     transparentForeground=adaptedForeground;
+    sharedPaperPixels=adaptedForeground?stages.get("shared-paper-pixels",[foregroundFrame,Y],()=>{
+      const pixels=new Uint8ClampedArray(foregroundFrame.effectBackground);
+      if(Y!==100)for(let i=0;i<pixels.length;i+=4)for(let c=0;c<3;c++)pixels[i+c]*=Y/100;
+      return pixels;
+    }):null;
     effectBackdrop=adaptedForeground?stages.get("effect-backdrop",[foregroundFrame,Y],()=>{
       const canvas=document.createElement("canvas");canvas.width=canvas.height=renderSize;
       const pixels=new Uint8ClampedArray(foregroundFrame.effectBackground);
@@ -228,7 +241,7 @@ O.useLayoutEffect(() => {
     lettersMotion.current.fullFrameLetters = modes.size === 1 && modes.has("letters");
     // Keep video exposure history advancing even while Action/Ribbons is shown.
     const frameTone = Je && (videoSource || modes.has("letters") || modes.has("dotmatrix")) ? stages.get("tone", [sourceFrame], () => gridAdaptiveTone(sourceFrame.data, Je, frameTime)) : null;
-    sharedGlow=adaptedForeground&&modes.has("clean")&&modes.size>1?stages.get("shared-action-paper",[foregroundFrame,Y,J.clean,W,j,Z,B,Q,Lt,actionClarity],()=>{
+    sharedGlow=adaptedForeground&&modes.has("clean")?stages.get("shared-action-paper",[foregroundFrame,Y,J.clean,W,j,Z,B,Q,Lt,actionClarity],()=>{
       const pixels=new Uint8ClampedArray(foregroundFrame.effectBackground);
       if(Y!==100)for(let i=0;i<pixels.length;i+=4)for(let c=0;c<3;c++)pixels[i+c]*=Y/100;
       return gb(pixels,renderSize,renderSize,J.clean,W/100,j,Z,B,Q,Lt,Je.naturalWidth,Je.naturalHeight,actionClarity);
