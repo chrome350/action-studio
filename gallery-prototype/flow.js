@@ -1,3 +1,4 @@
+const heartIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg>';
 let participant='', state=null, stateSignature='', selectedWork=null, uploadData='', apiReady=false, drafts={};
 const starterWorks=Array.from({length:11},(_,i)=>({id:'starter-'+(i+1),title:'Стартовая работа '+(i+1),image:'assets/starters/frame-'+(i+1)+'.jpg',starter:true}));
 starterWorks.forEach(w=>add(w.image,w.title));
@@ -8,11 +9,32 @@ async function api(path,body){if(window.galleryCloud)return galleryCloud.request
 function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
 function renderMine(){const list=$('#my-list');list.replaceChildren();const statuses={pending:'На модерации',approved:'Опубликована',rejected:'Не одобрена'};for(const w of state.mine){const row=el('div',undefined,'submission-row');row.append(el('strong',w.title),el('span',statuses[w.status]));list.append(row)}if(!state.mine.length)list.append(el('p','Вы ещё не отправляли работы.'))}
 function renderState(next){state=next;const phase=state.settings.phase;
+const submissionHeading=$('#submission-heading');
+if(submissionHeading){
+submissionHeading.hidden=!['upload','voting','words'].includes(phase);
+if(submissionHeading.dataset.phase!==phase){
+submissionHeading.dataset.phase=phase;
+const lines=phase==='words'?['ЧТО ВАС ЗАЦЕПИЛО?']:phase==='voting'?['ВЫБЕРИТЕ','ТОП-3 КАДРА']:['ОТПРАВЬТЕ СВОЙ КАДР','В ГАЛЕРЕЮ'];
+submissionHeading.replaceChildren(...lines.flatMap((line,i)=>i?[document.createTextNode(' '),el('span',line)]:[el('span',line)]));
+}
+}
 $('#add-impression').hidden=phase!=='words';
 $('.upload').hidden=phase!=='upload';$('#empty').textContent=state.settings.liked?'Пока нет работ с лайками':'Здесь скоро появятся работы. Загрузите свою.';
-const shown=[...(phase==='upload'&&!state.settings.liked?starterWorks:[]),...state.works.filter(w=>!state.settings.liked||w.likes>0)];const words=state.words;
+// Published works replace starters one for one; the liked-only view stays literal.
+const remainingStarters=state.settings.liked?[]:starterWorks.slice(state.works.length);
+const shown=[...remainingStarters,...state.works.filter(w=>!state.settings.liked||w.likes>0)];const words=state.words;
 const signature=JSON.stringify([shown.map(w=>[w.id,w.title,w.image]),words]);
 if(signature!==stateSignature){stateSignature=signature;transition=null;imageObserver?.disconnect();container.replaceChildren();items=[];shown.forEach(w=>add(w.image||'/api/image/'+w.id,w.title,w.starter?null:w));words.forEach(w=>{const b=el('div',w.text,'word-card ds-word-bubble');container.append(b);items.push({b,p:null})});stage.classList.toggle('grid',grid);$('#empty').hidden=items.length>0;requestLayout()}
+// Votes can change without a change to the artwork list or layout.
+const myVotes=new Set(state.votes);
+for(const item of items){
+if(!item.work)continue;
+const liked=myVotes.has(item.work.id);
+let badge=item.b.querySelector('.card-like');
+if(liked&&!badge){badge=el('span',undefined,'card-like');badge.innerHTML=heartIcon;badge.setAttribute('aria-hidden','true');item.b.append(badge)}
+if(!liked&&badge)badge.remove();
+item.b.setAttribute('aria-label','Открыть работу: '+item.work.title+(liked?' — вам понравилось':''));
+}
 renderMine();if(selectedWork&&$('#detail').open)renderWork(selectedWork);}
 let votePending=false;
 function renderWork(work){
@@ -26,7 +48,7 @@ let control=box.querySelector('.like-control');
 if(!control||control.dataset.work!==work.id){
 box.replaceChildren();control=el('div',undefined,'like-control');control.dataset.work=work.id;
 const button=el('button',undefined,'like-button');button.type='button';
-button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg>';
+button.innerHTML=heartIcon;
 const count=el('span',undefined,'like-count');count.setAttribute('aria-live','polite');count.setAttribute('aria-atomic','true');
 control.append(button,count);box.append(control);
 }
@@ -77,8 +99,8 @@ $('#impression-form').onsubmit=async e=>{
  const entries=[...form.querySelectorAll('input[name="impression"]')].map(input=>({input,text:input.value.trim().replace(/\s+/g,' ')})).filter(entry=>entry.text);
  const error=$('#impression-error');error.textContent='';
  if(!entries.length){error.textContent='Заполните хотя бы одно поле.';return}
- const invalid=entries.find(entry=>entry.text.length>60);
- if(invalid){error.textContent='В каждом поле — до 60 символов.';invalid.input.focus();return}
+ const invalid=entries.find(entry=>entry.text.length>100);
+ if(invalid){error.textContent='В каждом поле — до 100 символов.';invalid.input.focus();return}
  button.disabled=true;let sent=0;
  try{for(const entry of entries){await api('words',{text:entry.text});entry.input.value='';sent++}form.reset();$('#impression-dialog').close();toast('Ответ отправлен');await refresh()}
  catch(err){error.textContent=(sent?'Часть ответа уже отправлена. Повторите отправку оставшихся полей. ':'')+err.message}

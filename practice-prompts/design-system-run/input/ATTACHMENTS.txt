@@ -1,0 +1,5 @@
+Все три шага выполняются последовательно в одном новом чате.
+Шаг 1: specification.txt; design-system-guide.txt; rendering-contract.txt; reference-desktop.png; reference-mobile.png; avito-wordmark.svg; action-wordmark.svg; AvitoSansDisplay-Regular.woff; AvitoSansText-Regular.woff2; AvitoSansTextMono-Regular.woff2; flowers.png; design-system/tokens.css, typography.css, buttons.css, fields.css, sliders.css, panels.css, empty-state.css.
+Шаг 2: action-core.js; expected-default.png. Использовать собственный step1.html и все вложения шага 1 из чата.
+Шаг 3: action-animation.js; animation-contract.txt; design-system/checkboxes.css. Использовать собственный step2.html и все предыдущие вложения из чата.
+В другом чате нужно приложить также все предыдущие материалы и HTML, созданный самим участником на предыдущем шаге. Готовый HTML редактора не прикладывать.

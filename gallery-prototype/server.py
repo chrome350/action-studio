@@ -116,7 +116,7 @@ class Handler(SimpleHTTPRequestHandler):
                 if path=='/api/words':
                     if phase!='words':raise Error('Сбор впечатлений сейчас закрыт.')
                     text=' '.join(str(body.get('text','')).split())
-                    if not 1<=len(text)<=60:raise Error('Напишите от 1 до 60 символов.')
+                    if not 1<=len(text)<=100:raise Error('Напишите от 1 до 100 символов.')
                     c.execute("INSERT INTO words(person,text,status) VALUES(?,?,'pending')",(person,text))
                     return self.reply({'ok':True})
                 ident=body.get('id');work=c.execute("SELECT 1 FROM works WHERE id=? AND status='approved'",(ident,)).fetchone()

@@ -8,7 +8,10 @@ create table if not exists gallery_private.admins(email text primary key);
 create table if not exists gallery_private.people(id uuid primary key references auth.users(id), created_at timestamptz not null default now());
 create table if not exists gallery_private.works(id uuid primary key default gen_random_uuid(), person uuid not null references auth.users(id), path text unique not null, title text not null default 'Изображение', author text not null default 'Участник', status text not null default 'pending' check(status in ('pending','approved','rejected')), created_at timestamptz not null default now());
 create table if not exists gallery_private.votes(person uuid references auth.users(id), work uuid references gallery_private.works(id) on delete cascade, primary key(person,work));
-create table if not exists gallery_private.words(id uuid primary key default gen_random_uuid(), person uuid not null references auth.users(id), text text not null check(char_length(text) between 1 and 60), status text not null default 'pending' check(status in ('pending','approved','rejected')), created_at timestamptz not null default now());
+create table if not exists gallery_private.words(id uuid primary key default gen_random_uuid(), person uuid not null references auth.users(id), text text not null check(char_length(text) between 1 and 100), status text not null default 'pending' check(status in ('pending','approved','rejected')), created_at timestamptz not null default now());
+-- Update the limit for existing installations as well.
+alter table gallery_private.words drop constraint if exists words_text_check;
+alter table gallery_private.words add constraint words_text_check check(char_length(text) between 1 and 100);
 alter table gallery_private.settings enable row level security;
 alter table gallery_private.admins enable row level security;
 alter table gallery_private.people enable row level security;
@@ -57,7 +60,7 @@ begin
  elsif action='words' then
   if cfg.phase<>'words' then raise exception 'Сбор впечатлений сейчас закрыт'; end if;
   answer:=trim(regexp_replace(coalesce(payload->>'text',''),'\s+',' ','g'));
-  if char_length(answer) not between 1 and 60 then raise exception 'Напишите от 1 до 60 символов.'; end if;
+  if char_length(answer) not between 1 and 100 then raise exception 'Напишите от 1 до 100 символов.'; end if;
   if (select count(*) from gallery_private.words where person=uid)>=20 then raise exception 'Вы уже отправили 20 ответов'; end if;
   insert into gallery_private.words(person,text) values(uid,answer);
  elsif action like 'admin%' then

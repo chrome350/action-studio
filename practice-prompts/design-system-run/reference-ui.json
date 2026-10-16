@@ -1,0 +1,234 @@
+[
+  {
+    "width": 1440,
+    "overflow": false,
+    "elements": [
+      {
+        "selector": "aside",
+        "font": "11px / 16.5px AvitoSansText, sans-serif",
+        "rect": [
+          1124,
+          20,
+          300,
+          960
+        ]
+      },
+      {
+        "selector": ".stage",
+        "font": "11px / 16.5px AvitoSansText, sans-serif",
+        "rect": [
+          262,
+          202,
+          600,
+          600
+        ]
+      },
+      {
+        "selector": ".panel-title strong",
+        "font": "14px / 20px AvitoSansDisplay, sans-serif",
+        "rect": [
+          1138,
+          44,
+          65.703125,
+          20
+        ]
+      },
+      {
+        "selector": ".panel-section h2",
+        "font": "14px / 20px AvitoSansDisplay, sans-serif",
+        "rect": [
+          1138,
+          92.890625,
+          272,
+          20
+        ]
+      },
+      {
+        "selector": ".parameter-label",
+        "font": "10px / 15px AvitoSansText, sans-serif",
+        "rect": [
+          1150,
+          315.390625,
+          63,
+          15
+        ]
+      },
+      {
+        "selector": ".parameter-value input",
+        "font": "",
+        "rect": [
+          1358,
+          309.890625,
+          32,
+          26
+        ]
+      },
+      {
+        "selector": ".grid-line-hex",
+        "font": "",
+        "rect": [
+          1177,
+          154.890625,
+          126,
+          34
+        ]
+      },
+      {
+        "selector": ".grid-dimension input",
+        "font": "",
+        "rect": [
+          1223,
+          202.890625,
+          34,
+          34
+        ]
+      },
+      {
+        "selector": ".liquid-button",
+        "font": "12px / 16px AvitoSansText, sans-serif",
+        "rect": [
+          483.453125,
+          482,
+          157.078125,
+          40
+        ]
+      },
+      {
+        "selector": ".studio-slider",
+        "font": "11px / 16.5px AvitoSansText, sans-serif",
+        "rect": [
+          1229,
+          305.890625,
+          109,
+          34
+        ]
+      },
+      {
+        "selector": ".studio-slider-thumb",
+        "font": "11px / 16.5px AvitoSansText, sans-serif",
+        "rect": [
+          1268.6875,
+          305.890625,
+          16,
+          34
+        ]
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "overflow": false,
+    "elements": [
+      {
+        "selector": "aside",
+        "font": "11px / 16.5px AvitoSansText, sans-serif",
+        "rect": [
+          16,
+          570,
+          358,
+          803.1875
+        ]
+      },
+      {
+        "selector": ".stage",
+        "font": "11px / 16.5px AvitoSansText, sans-serif",
+        "rect": [
+          16,
+          72,
+          358,
+          358
+        ]
+      },
+      {
+        "selector": ".panel-title strong",
+        "font": "14px / 20px AvitoSansDisplay, sans-serif",
+        "rect": [
+          32,
+          598,
+          65.703125,
+          20
+        ]
+      },
+      {
+        "selector": ".panel-section h2",
+        "font": "14px / 20px AvitoSansDisplay, sans-serif",
+        "rect": [
+          32,
+          662.1875,
+          326,
+          20
+        ]
+      },
+      {
+        "selector": ".parameter-label",
+        "font": "10px / 15px AvitoSansText, sans-serif",
+        "rect": [
+          44,
+          918.6875,
+          63,
+          15
+        ]
+      },
+      {
+        "selector": ".parameter-value input",
+        "font": "",
+        "rect": [
+          306,
+          913.1875,
+          32,
+          26
+        ]
+      },
+      {
+        "selector": ".grid-line-hex",
+        "font": "",
+        "rect": [
+          75,
+          720.1875,
+          156,
+          42
+        ]
+      },
+      {
+        "selector": ".grid-dimension input",
+        "font": "",
+        "rect": [
+          142,
+          776.1875,
+          36,
+          42
+        ]
+      },
+      {
+        "selector": ".liquid-button",
+        "font": "12px / 16px AvitoSansText, sans-serif",
+        "rect": [
+          125.953125,
+          229,
+          138.078125,
+          44
+        ]
+      },
+      {
+        "selector": ".studio-slider",
+        "font": "11px / 16.5px AvitoSansText, sans-serif",
+        "rect": [
+          123,
+          909.1875,
+          163,
+          34
+        ]
+      },
+      {
+        "selector": ".studio-slider-thumb",
+        "font": "11px / 16.5px AvitoSansText, sans-serif",
+        "rect": [
+          185.9375,
+          909.1875,
+          16,
+          34
+        ]
+      }
+    ]
+  }
+]

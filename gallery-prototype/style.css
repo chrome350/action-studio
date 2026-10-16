@@ -23,7 +23,7 @@ header .upload:focus-visible{outline:2px solid #bfaaff;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.card::after{transition:none}}
 [hidden]{display:none!important}#session-bar{display:flex;justify-content:center;align-items:center;gap:18px;min-height:40px;color:#b9bac5;font-size:12px}body:has(#session-bar:not([hidden])) main{height:calc(100svh - 211px)}#session-bar button{padding:6px 12px;font-size:11px}#empty{position:absolute;inset:0;display:grid;place-items:center;color:#777986;pointer-events:none}.word-card{position:absolute;top:0;left:0;width:190px;min-height:80px;padding:24px 12px;text-align:center;font:22px/1.2 Display,Arial;color:#b5e4ff;text-shadow:0 0 15px #259cdb88;transform-origin:0 0;pointer-events:none;overflow-wrap:anywhere}dialog{width:min(480px,90vw);padding:28px;max-height:90svh;overflow:auto}dialog h2{font:24px Display,Arial;margin:4px 28px 16px 0}dialog p{line-height:1.5}dialog form{display:grid;gap:18px}dialog label{display:grid;gap:8px;color:#ccc;font-size:13px}dialog input{min-width:0;width:100%;font:inherit;color:#fff;background:#ffffff08;border:1px solid #ffffff25;border-radius:10px;padding:12px}dialog button[type=submit]{border-radius:999px;background:#303138}.dialog-close{position:absolute;right:12px;top:12px;border:0;padding:6px 10px}#upload-preview{display:flex;align-items:center;gap:14px;padding:18px;background:#ffffff04;border-radius:14px;min-width:0}#upload-preview svg{flex:none;color:#bfaaff}#upload-filename{flex:1;min-width:0;overflow-wrap:anywhere;font-size:14px}#replace-file{flex:none;font-size:12px;padding:8px 12px}#submit-error{color:#ffa8b4;margin:0}#toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);max-width:90vw;width:max-content;padding:14px 20px;border:1px solid #ffffff24;border-radius:14px;background:#24252a;z-index:1000;font-size:13px}#detail{width:auto}#large{margin:auto}#work-actions{padding-top:18px;display:flex;justify-content:center}#work-actions:empty{display:none}#work-actions form{margin-top:20px}#work-actions input{min-width:250px}.submission-row{display:flex;justify-content:space-between;gap:20px;padding:16px 0;border-bottom:1px solid #ffffff15}.submission-row span{color:#9da0ae;font-size:12px}button:disabled{opacity:.5;cursor:default}@media(max-width:700px){body:has(#session-bar:not([hidden])) main{height:calc(100svh - 195px)}#session-bar{gap:10px;font-size:11px}}
 /* Keep corner branding in place when submissions are closed. */
-header>.brand-logo:first-child{grid-column:1;grid-row:1}header>.brand-right{grid-column:3;grid-row:1}header>.upload,header>a{grid-column:2;grid-row:1}
+header>.brand-logo:not(.brand-right){grid-column:1;grid-row:1}header>.brand-right{grid-column:3;grid-row:1}header>.upload,header>a{grid-column:2;grid-row:1}
 /* Same neutral glass material and type scale as Grid Studio actions. */
 dialog button[type=submit],#work-actions>button,.admin-wrap button{border:0;border-radius:999px;background:linear-gradient(#ffffff18,#ffffff04 45%,#00000012),#ffffff08;box-shadow:0 2px 5px #0003,0 0 0 1px #0003,inset 0 1px 1px #ffffff8c,inset 1px 0 2px #ffffff40,inset -1px 0 2px #ffffff40,inset 0 -1px 1px #0009,inset 0 2px 5px #ffffff18,inset 0 -3px 6px #ffffff12;font-size:12px;font-weight:400}
 
@@ -53,3 +53,21 @@ dialog button[type=submit],#work-actions>button,.admin-wrap button{border:0;bord
 #detail{border:0;border-radius:12px;background:#07080b;box-shadow:0 12px 35px #0007,inset 0 0 2px #72ceff99,inset 0 0 7px #259cdbb3,inset 0 0 15px #1684bd80}
 .like-control:has(.like-button[aria-pressed=true]) .like-count{color:#a855ff}
 .like-control:has(.like-button[aria-pressed=true]:hover) .like-count{color:#b66cff}
+
+/* Submission-stage heading, matching the workshop slide. */
+@font-face{font-family:Display;src:url('../fonts/AvitoSansDisplay-ExtraBold.woff');font-weight:800}
+#submission-heading{grid-column:2;grid-row:1;margin:0;max-width:none;text-align:center;font:800 clamp(24px,3.8vw,60px)/.98 Display,Arial;color:#f5f5f7}
+#submission-heading span{display:block}
+header:has(#submission-heading:not([hidden])){height:190px;grid-template-columns:148px minmax(0,1fr) 148px;grid-template-rows:max-content 40px;align-content:start;align-items:start;padding-top:24px;padding-bottom:16px;gap:16px 22px}
+header:has(#submission-heading:not([hidden]))>.brand-logo{align-self:start}
+header:has(#submission-heading:not([hidden]))>.upload{grid-row:2}
+body:has(#submission-heading:not([hidden])) main{height:calc(100svh - 265px)}
+@media(max-width:700px){
+ header:has(#submission-heading:not([hidden])){height:190px;grid-template-columns:1fr auto 1fr;grid-template-rows:30px max-content 36px;padding:18px 16px 10px;gap:12px}
+ #submission-heading{grid-column:1/-1;grid-row:2;font-size:clamp(22px,4.5vw,30px)}
+ header:has(#submission-heading:not([hidden]))>.upload{grid-row:3}
+}
+
+/* Personal like marker reuses the artwork viewer's heart. */
+.card .card-like{position:absolute;top:10px;right:10px;z-index:1;display:grid;place-items:center;width:32px;height:32px;padding:0;border-radius:50%;background:#160d24dd;color:#a855ff;pointer-events:none}
+.card-like svg{width:16.8px;height:16.8px;fill:currentColor;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;overflow:visible}

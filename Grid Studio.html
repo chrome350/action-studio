@@ -1464,7 +1464,7 @@ dialog.ds-modal{box-sizing:border-box;width:440px;max-width:calc(100vw - 32px);m
 dialog.ds-modal::backdrop{background:#030408cc;backdrop-filter:blur(10px)}
 dialog.ds-modal h2{margin:0 40px 20px 0;max-width:none;font:400 14px/20px AvitoSansDisplay,sans-serif;color:var(--ds-text)}
 dialog.ds-modal form{display:grid;gap:16px;margin:0}
-dialog.ds-modal input{box-sizing:border-box;width:100%;min-width:0;height:40px;margin:0;padding:0 12px;border:1px solid #ffffff20;border-radius:var(--ds-radius-control);background:var(--ds-field);color:var(--ds-text);font:400 10px/15px var(--ds-font-text)}
+dialog.ds-modal input{box-sizing:border-box;width:100%;min-width:0;height:40px;margin:0;padding:0 12px;border:0;border-radius:var(--ds-radius-control);background:var(--ds-field);color:var(--ds-text);font:400 10px/15px var(--ds-font-text)}
 dialog.ds-modal input:focus-visible{outline:2px solid var(--ds-focus);outline-offset:2px}
 dialog.ds-modal .ds-modal-close{position:absolute;right:16px;top:16px;display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;border-radius:9px;background:transparent;color:var(--ds-text)}
 dialog.ds-modal .ds-modal-close svg{width:16px;height:16px}
@@ -1474,6 +1474,16 @@ dialog.ds-modal [role=alert]{margin:0;color:#ffa8b4;font:400 10px/15px var(--ds-
 dialog.ds-modal [role=alert]:empty{display:none}
 dialog.ds-modal button[type=submit]{width:100%}
 @media(max-width:600px){dialog.ds-modal{padding:20px}dialog.ds-modal input{height:44px}dialog.ds-modal .ds-modal-close{width:36px;height:36px;right:12px;top:12px}}
+
+/* Gallery variant: same inset glow as the artwork viewer. */
+dialog.ds-modal.ds-modal-gallery{border:0;border-radius:12px;background:#07080b;box-shadow:0 12px 35px #0007,inset 0 0 2px #72ceff99,inset 0 0 7px #259cdbb3,inset 0 0 15px #1684bd80}
+/* Keep the title and close control aligned even when the title wraps. */
+dialog.ds-modal-gallery[open]{display:grid;grid-template-columns:minmax(0,1fr) 32px;column-gap:12px;row-gap:20px;padding:24px 32px 32px}
+dialog.ds-modal-gallery h2{grid-column:1;grid-row:1;align-self:center;margin:0}
+dialog.ds-modal-gallery .ds-modal-close{position:static;grid-column:2;grid-row:1;align-self:center}
+dialog.ds-modal-gallery form{grid-column:1/-1}
+dialog.ds-modal-gallery::backdrop{background:#03040880}
+@media(max-width:600px){dialog.ds-modal-gallery[open]{padding:20px 28px 28px;grid-template-columns:minmax(0,1fr) 36px}}
 
 .ds-word-bubble{box-sizing:border-box;display:flex;align-items:center;justify-content:center;min-height:64px;padding:18px 20px;border:0;border-radius:999px;background:linear-gradient(160deg,#ffffff12,#ffffff03 45%,#00000012),#07131c;color:#c9edff;box-shadow:inset 0 0 2px #72ceff99,inset 0 0 7px #259cdbb3,inset 0 0 15px #1684bd80,0 3px 12px #0005;font:400 14px/20px AvitoSansDisplay,sans-serif;text-align:center;text-shadow:none;overflow-wrap:break-word;word-break:normal}
 .word-card.ds-word-bubble{width:190px;min-height:64px;padding:18px 20px;font:400 14px/20px AvitoSansDisplay,sans-serif;text-shadow:none;overflow-wrap:break-word}

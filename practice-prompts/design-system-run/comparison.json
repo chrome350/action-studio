@@ -1,0 +1,73 @@
+{
+  "errors": [],
+  "comparisons": [
+    {
+      "name": "default",
+      "differentPixels": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Интенсивность",
+      "differentPixels": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Свечение",
+      "differentPixels": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Шлейф",
+      "differentPixels": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Чёткая зона",
+      "differentPixels": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Масштаб",
+      "differentPixels": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Яркость",
+      "differentPixels": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "Контраст",
+      "differentPixels": 0,
+      "maxDelta": 0
+    },
+    {
+      "name": "reset",
+      "differentPixels": 0,
+      "maxDelta": 0
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "disabledBeforeUpload": true,
+      "scaleChanges": true,
+      "resetExact": true
+    },
+    {
+      "step": 2,
+      "disabledBeforeUpload": true,
+      "scaleChanges": true,
+      "resetExact": true,
+      "expected": {
+        "differentPixels": 0,
+        "maxDelta": 0
+      }
+    }
+  ],
+  "export": {
+    "differentPixels": 0,
+    "maxDelta": 0
+  },
+  "mobileOverflow": false
+}

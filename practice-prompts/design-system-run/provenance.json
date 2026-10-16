@@ -1,0 +1,12 @@
+{
+  "thread": "01a14188-c748-7e01-8d6a-19ad75c889a2",
+  "input": "Participant-design-system.zip",
+  "input_sha256": "deee74920b93f3bca84f032752ba9e6de7e7589f06055ca4b10e2660e2dc9da7",
+  "reference": "http://127.0.0.1:56894/",
+  "reference_hashes": {
+    "assets/index-BwYdjEfo.js": "91274898c6b16add988973a5912daf628a3f0f34c2decc4aa9cd26e3df4f39ea",
+    "assets/index-DlFOVRFE.css": "30f8b2a650db955eb428b16864152cd78141696bc0611e7e6de2130a5e1b49e3",
+    "source/clean-effect.ts": "632e417176eca3335a1da851df88cbfb48429f7be259f4b55a316b4c5f01f790"
+  },
+  "isolation": "Fresh projectless chat, input-only instruction; not OS filesystem isolation"
+}

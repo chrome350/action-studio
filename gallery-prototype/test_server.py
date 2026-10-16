@@ -35,10 +35,11 @@ class FlowTest(unittest.TestCase):
   self.assertEqual(self.call('/api/vote',{'id':ids[0],'liked':True},other)[0],200)
   self.call('/api/admin/settings',{'phase':'words','liked':True,'words':True},admin=True)
   self.assertEqual(self.call('/api/vote',{'id':ids[0],'liked':False},other)[0],400)
-  self.assertEqual(self.call('/api/words',{'id':ids[0],'text':'раз два три четыре'},other)[0],400)
+  self.assertEqual(self.call('/api/words',{'id':ids[0],'text':'я'*101},other)[0],400)
   self.assertEqual(self.call('/api/words',{'id':ids[0],'text':'Цвет и ритм'},other)[0],200)
   self.assertEqual(self.call('/api/state')[1]['words'],[])
   word=self.call('/api/admin',admin=True)[1]['words'][0]
+  self.assertEqual(self.call('/api/words',{'text':'я'*100},other)[0],200)
   self.assertEqual(self.call('/api/admin/moderate-word',{'id':word['id'],'status':'approved'})[0],401)
   self.call('/api/admin/moderate-word',{'id':word['id'],'status':'approved'},admin=True)
   self.assertEqual(self.call('/api/state')[1]['words'][0]['text'],'Цвет и ритм')

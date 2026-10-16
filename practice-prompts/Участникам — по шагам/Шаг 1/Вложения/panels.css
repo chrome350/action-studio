@@ -1,0 +1,8 @@
+
+/* grid-flat-panels:start */
+aside,.stage,.bottom-actions,aside .panel-title,aside .panel-title.is-scrolled{box-shadow:none}
+/* Match the HEX input to the grid dimension inputs at each breakpoint. */
+.grid-line-fields .grid-line-hex{font-size:var(--ds-input-size);font-weight:500}
+
+aside .grid-visibility svg{width:18px;height:18px}
+/* grid-flat-panels:end */

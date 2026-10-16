@@ -1,0 +1,5 @@
+
+/* grid-empty-state:start */
+.stage{position:relative}
+.empty-stage{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center}
+/* grid-empty-state:end */

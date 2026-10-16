@@ -1,0 +1,26 @@
+/* Four roles; color and responsive hit areas do not create new text styles. */
+.ds-type-heading,aside .panel-title strong,aside .panel-section h2,aside .panel-section h3{
+ font:400 14px/20px AvitoSansDisplay,sans-serif;letter-spacing:0;
+}
+.ds-type-label,aside .compact-control .parameter-label,aside .grid-line-control>label,aside .grid-dimension label,aside label:has(>input[type="checkbox"]),aside .control-label,aside .dot-palette-control>label{
+ font:400 10px/15px var(--ds-font-text);letter-spacing:0;
+}
+.ds-type-value,aside .parameter-value,aside .parameter-value input,aside .grid-dimension input,aside .grid-line-fields input,aside .grid-line-fields .grid-line-hex,aside .grid-line-opacity,aside .grid-cell-count,aside .summary,aside .color-row code{
+ font:500 10px/15px var(--ds-font-number);font-variant-numeric:tabular-nums;letter-spacing:0;
+}
+.ds-type-button,:is(.bottom-actions,.empty-stage,.ds-actions,.ds-modal,aside .panel-section) .liquid-button{
+ font:400 12px/16px var(--ds-font-text);letter-spacing:0;
+}
+/* Secondary controls and dialogs use the same four roles. */
+aside .parameter-label,aside label.dot-palette-control,aside .video-controls p,aside p[role="alert"],.color-picker-rgb label span{
+ font:400 10px/15px var(--ds-font-text);letter-spacing:0;
+}
+aside .effect-heading #effect-mode,aside .dot-palette-control select,aside .gradient-field,.gradient-field .gradient-name,.gradient-popup .gradient-options button,.video-controls button,.video-controls a{
+ font:400 12px/16px var(--ds-font-text);letter-spacing:0;
+}
+.gradient-popup .gradient-popup-heading strong{font:400 14px/20px AvitoSansDisplay,sans-serif;letter-spacing:0}
+.color-picker-popup input.color-picker-hex,.color-picker-popup .color-picker-rgb input,aside .grid-line-opacity input{
+ font:500 10px/15px var(--ds-font-number);letter-spacing:0;font-variant-numeric:tabular-nums;
+}
+.video-controls .video-timeline span{font:500 10px/15px var(--ds-font-number);font-variant-numeric:tabular-nums}
+.color-picker-popup .color-picker-rgb label{font:400 10px/15px var(--ds-font-text)}
