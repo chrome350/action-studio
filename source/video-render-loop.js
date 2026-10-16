@@ -24,7 +24,7 @@ O.useLayoutEffect(() => {
   let Al = null, De = null, dotCells = [], firstRender = true;
   const qe = document.createElement("canvas"), work = document.createElement("canvas");
   qe.width = qe.height = work.width = work.height = renderSize;
-  let frameSource = null, publishedTime = 0, transparentForeground=false,effectBackdrop=null,hasTransparentLetters=false,actionCoverage=null;
+  let frameSource = null, publishedTime = 0, transparentForeground=false,effectBackdrop=null,hasTransparentLetters=false;
   lettersMotion.current.scale = renderScale;
   let ga = performance.now(), fu = 0;
   const su = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -40,7 +40,7 @@ O.useLayoutEffect(() => {
   const Ae = (Mt) => {
     if (Mt.drawImage(Al, 0, 0), oe && Me) {
       const Wt = qe.getContext("2d");
-      Wt.clearRect(0, 0, renderSize, renderSize), yb(Wt, oe, su || !actionAnimate ? null : y.current, Q, Lt), Wt.globalCompositeOperation = "destination-in", actionCoverage&&Wt.drawImage(actionCoverage,0,0), Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
+      Wt.clearRect(0, 0, renderSize, renderSize), yb(Wt, oe, su || !actionAnimate ? null : y.current, Q, Lt), Wt.globalCompositeOperation = "destination-in", Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
     }
     drawLettersInteraction(Mt, lettersMotion.current, lettersInteractive, lettersRadius, lettersStrength, su, performance.now(), v, _e.current);
     if (v && b > 0) {
@@ -196,11 +196,6 @@ O.useLayoutEffect(() => {
       canvas.getContext("2d").putImageData(new ImageData(pixels,renderSize,renderSize),0,0);
       return canvas;
     }):null;
-    actionCoverage=adaptedForeground?stages.get("action-object-coverage",[foregroundFrame],()=>{
-      const canvas=document.createElement("canvas");canvas.width=canvas.height=renderSize;
-      canvas.getContext("2d").putImageData(new ImageData(new Uint8ClampedArray(foregroundFrame.data),renderSize,renderSize),0,0);
-      return canvas;
-    }):null;
     const lettersBackdrop=effectBackdrop;
     const effectBackground=adaptedForeground?"#00000000":B;
 
@@ -306,16 +301,16 @@ O.useLayoutEffect(() => {
         }
         active && gi.push(kt * f + ne);
         const Xl = K[kt * f + ne], du = Xl && ci.some((yi) => yi.mode === Xl.mode) ? Xl : { mode: P }, ol = { ...du, size: J[du.mode] * renderScale };
-        // Action's feathered cell mask reveals its base at the boundary. Keep
-        // that base on the original input too, rather than the light-source signal.
+        // Action keeps its original continuous colour image, including the base
+        // revealed by feathered cell edges. The Dot/Letters foreground mask would
+        // break smooth photographic backgrounds and clip Action's coloured trails.
         if(ol.mode==="clean"&&adaptedForeground){
           for(let row=0;row<Ne;row++){
             const start=((il+row)*renderSize+Zt)*4;
-            cl.data.set(foregroundFrame.effectBackground.subarray(start,start+Ie*4),row*Ie*4);
-            if(Y!==100)for(let i=row*Ie*4;i<(row+1)*Ie*4;i+=4)for(let c=0;c<3;c++)cl.data[i+c]*=Y/100;
+            cl.data.set(actionFrame.data.subarray(start,start+Ie*4),row*Ie*4);
           }
         }
-        ol.mode === "pixels" ? db(cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j) : ol.mode === "dithering" ? fb(cl.data, Ie, Ne, B, Z, W / 100, j) : ol.mode === "clean" && !adaptedForeground && GridCleanStyle.applyBase(cl.data, B, W / 100, j), ol.mode === "clean" && (Vl.rect(Zt, il, Ie, Ne), be = true), ol.mode === "halftone" || ol.mode === "letters" ? (ke.width = Ie, ke.height = Ne, ol.mode === "letters" ? mb(Oe, cl.data, Ie, Ne, ol.size, effectBackground, Z, W / 100, j, Zt, il, letterColor) : sb(Oe, cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j), ol.mode === "letters" && cacheLettersCell(lettersMotion.current, ke, Zt, il, ol.size, effectBackground, lettersBackdrop), adaptedForeground&&ol.mode==="letters"&&(Mt.clearRect(Zt,il,Ie,Ne),lettersBackdrop&&Mt.drawImage(lettersBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne)), Mt.drawImage(ke, Zt, il)) : Mt.putImageData(cl, Zt, il);
+        ol.mode === "pixels" ? db(cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j) : ol.mode === "dithering" ? fb(cl.data, Ie, Ne, B, Z, W / 100, j) : ol.mode === "clean" && GridCleanStyle.applyBase(cl.data, B, W / 100, j), ol.mode === "clean" && (Vl.rect(Zt, il, Ie, Ne), be = true), ol.mode === "halftone" || ol.mode === "letters" ? (ke.width = Ie, ke.height = Ne, ol.mode === "letters" ? mb(Oe, cl.data, Ie, Ne, ol.size, effectBackground, Z, W / 100, j, Zt, il, letterColor) : sb(Oe, cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j), ol.mode === "letters" && cacheLettersCell(lettersMotion.current, ke, Zt, il, ol.size, effectBackground, lettersBackdrop), adaptedForeground&&ol.mode==="letters"&&(Mt.clearRect(Zt,il,Ie,Ne),lettersBackdrop&&Mt.drawImage(lettersBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne)), Mt.drawImage(ke, Zt, il)) : Mt.putImageData(cl, Zt, il);
       }
       const base = document.createElement("canvas"), mask = document.createElement("canvas");
       base.width = base.height = mask.width = mask.height = renderSize;

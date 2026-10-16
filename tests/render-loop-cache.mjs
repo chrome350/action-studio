@@ -73,7 +73,7 @@ function harness(overrides = {}) {
     gb() { counts.action++; return {}; },
     yb() { counts.actionDraw++; }, hb() {},
     qf() {},
-    GridCleanStyle: { prepareGlow() { return { image: canvas() }; }, applyBase() { counts.actionBase++; } },
+    GridCleanStyle: { prepareGlow() { return { image: canvas() }; }, applyBase(data) { counts.actionBase++; counts.actionBasePixel=Array.from(data.slice(0,4)); } },
     lettersColorField() { counts.letters++; return {}; },
     mb() { counts.glyphs++; },
     cacheLettersCell(state, image, x, y, size) { state.cells.push({ image, x, y, size, tiles: [{ ox: 0, oy: 0, vx: 0, vy: 0 }] }); },
@@ -367,13 +367,16 @@ assert.deepEqual(prepared(glowMotion), glowPrepared, 'animation controls preserv
 glowMotion.dispose();
 console.log('Action animation: cached repaint, speed, still capture and disabled idle state passed.');
 // Light mixed scenes use one photographic backdrop; Action still runs its
-// original renderer, but its cell base must never grade the light backdrop.
+// original renderer and grades the original cell pixels, not the inferred backdrop.
 const lightMixed=harness({gridForegroundForEffects(data,w,h,bounds,metadata){
  const bg=new Uint8ClampedArray(data.length),signal=new Uint8ClampedArray(data.length);
  for(let i=0;i<data.length;i+=4){bg.set([218,235,242,255],i);signal.set([120,100,80,0],i);}
  metadata.background=bg;return signal;
 }});
 lightMixed.render();lightMixed.tick();
-assert.equal(lightMixed.counts.actionBase,0,'light background bypasses Action base grading');
+assert.ok(lightMixed.counts.actionBase>0,'light Action retains original base grading');
 assert.ok(lightMixed.counts.action>0,'original Action renderer remains in use');
+assert.deepEqual(lightMixed.counts.actionBasePixel,[128,128,128,128],'Action grades original pixels, never the inferred pastel backdrop');
+lightMixed.render({Y:50});lightMixed.tick();
+assert.deepEqual(lightMixed.counts.actionBasePixel,[64,64,64,128],'light Action applies brightness exactly once');
 lightMixed.dispose();
