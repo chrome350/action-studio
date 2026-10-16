@@ -65,7 +65,7 @@
 
 ## Shared gallery components
 
-The impression dialog uses modal.css and LiquidButton. Padding: 24 px desktop, 20 px mobile; form gap: 16 px; input height: 40/44 px. Native dialog preserves Escape and focus. The catalog form does not submit data.
+The impression and image-upload dialogs use modal.css and LiquidButton. Both gallery headings preserve the upload dialog’s 24 px Avito Sans Display style. Padding: 24 px desktop, 20 px mobile; form gap: 16 px; input height: 40/44 px. Native dialog preserves Escape and focus. The catalog form does not submit data.
 
 bubbles.css provides decorative blue word bubbles matching gallery image glow. They are not buttons.
 

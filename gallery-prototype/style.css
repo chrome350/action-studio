@@ -27,7 +27,6 @@ header>.brand-logo:not(.brand-right){grid-column:1;grid-row:1}header>.brand-righ
 /* Same neutral glass material and type scale as Grid Studio actions. */
 dialog button[type=submit],#work-actions>button,.admin-wrap button{border:0;border-radius:999px;background:linear-gradient(#ffffff18,#ffffff04 45%,#00000012),#ffffff08;box-shadow:0 2px 5px #0003,0 0 0 1px #0003,inset 0 1px 1px #ffffff8c,inset 1px 0 2px #ffffff40,inset -1px 0 2px #ffffff40,inset 0 -1px 1px #0009,inset 0 2px 5px #ffffff18,inset 0 -3px 6px #ffffff12;font-size:12px;font-weight:400}
 
-.drop-zone{position:relative;min-height:190px;border:1px dashed #ffffff45;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer;background:#ffffff04;transition:background .2s,border-color .2s}.drop-zone input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.drop-zone strong{font-weight:400;font-size:17px}.drop-zone span{color:#999;pointer-events:none}.drop-zone small{font-size:11px;letter-spacing:0;margin-top:12px}.drop-zone:hover,.drop-zone.drag-over{background:#259cdb15;border-color:#72ceff}.drop-zone:focus-within{outline:2px solid #bfaaff;outline-offset:3px}
 
 /* Circular voting control; keep the count separate from the moving button. */
 #work-actions{padding:24px 0 12px}

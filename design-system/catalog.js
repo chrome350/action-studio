@@ -18,3 +18,8 @@ const modalDemo=document.querySelector('#demo-impression-dialog');
 document.querySelector('#open-modal-demo').onclick=()=>modalDemo.showModal();
 modalDemo.querySelector('.ds-modal-close').onclick=()=>modalDemo.close();
 modalDemo.querySelector('form').onsubmit=e=>{e.preventDefault();const fields=[...e.target.querySelectorAll('input')];const values=fields.map(x=>x.value.trim()).filter(Boolean);const error=modalDemo.querySelector('[role=alert]');if(!values.length){error.textContent='Заполните хотя бы одно поле.';return}if(values.some(x=>x.length>100)){error.textContent='В каждом поле — до 100 символов.';return}error.textContent='';modalDemo.close();e.target.reset()};
+
+const uploadModalDemo=document.querySelector('#demo-submission');
+document.querySelector('#open-upload-modal-demo').onclick=()=>uploadModalDemo.showModal();
+uploadModalDemo.querySelector('.ds-modal-close').onclick=()=>uploadModalDemo.close();
+uploadModalDemo.querySelector('form').onsubmit=e=>e.preventDefault();

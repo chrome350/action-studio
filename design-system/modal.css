@@ -4,8 +4,8 @@ dialog.ds-modal{box-sizing:border-box;width:440px;max-width:calc(100vw - 32px);m
 dialog.ds-modal::backdrop{background:#030408cc;backdrop-filter:blur(10px)}
 dialog.ds-modal h2{margin:0 40px 20px 0;max-width:none;font:400 14px/20px AvitoSansDisplay,sans-serif;color:var(--ds-text)}
 dialog.ds-modal form{display:grid;gap:16px;margin:0}
-dialog.ds-modal input{box-sizing:border-box;width:100%;min-width:0;height:40px;margin:0;padding:0 12px;border:0;border-radius:var(--ds-radius-control);background:var(--ds-field);color:var(--ds-text);font:400 10px/15px var(--ds-font-text)}
-dialog.ds-modal input:focus-visible{outline:2px solid var(--ds-focus);outline-offset:2px}
+dialog.ds-modal input:not([type=file]){box-sizing:border-box;width:100%;min-width:0;height:40px;margin:0;padding:0 12px;border:0;border-radius:var(--ds-radius-control);background:var(--ds-field);color:var(--ds-text);font:400 10px/15px var(--ds-font-text)}
+dialog.ds-modal input:not([type=file]):focus-visible{outline:2px solid var(--ds-focus);outline-offset:2px}
 dialog.ds-modal .ds-modal-close{position:absolute;right:16px;top:16px;display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;border-radius:9px;background:transparent;color:var(--ds-text)}
 dialog.ds-modal .ds-modal-close svg{width:16px;height:16px}
 dialog.ds-modal .ds-modal-close:hover{background:#ffffff0c}
@@ -13,14 +13,17 @@ dialog.ds-modal .ds-modal-close:focus-visible{outline:2px solid var(--ds-focus);
 dialog.ds-modal [role=alert]{margin:0;color:#ffa8b4;font:400 10px/15px var(--ds-font-text)}
 dialog.ds-modal [role=alert]:empty{display:none}
 dialog.ds-modal button[type=submit]{width:100%}
-@media(max-width:600px){dialog.ds-modal{padding:20px}dialog.ds-modal input{height:44px}dialog.ds-modal .ds-modal-close{width:36px;height:36px;right:12px;top:12px}}
+@media(max-width:600px){dialog.ds-modal{padding:20px}dialog.ds-modal input:not([type=file]){height:44px}dialog.ds-modal .ds-modal-close{width:36px;height:36px;right:12px;top:12px}}
 
 /* Gallery variant: same inset glow as the artwork viewer. */
 dialog.ds-modal.ds-modal-gallery{border:0;border-radius:12px;background:#07080b;box-shadow:0 12px 35px #0007,inset 0 0 2px #72ceff99,inset 0 0 7px #259cdbb3,inset 0 0 15px #1684bd80}
 /* Keep the title and close control aligned even when the title wraps. */
 dialog.ds-modal-gallery[open]{display:grid;grid-template-columns:minmax(0,1fr) 32px;column-gap:12px;row-gap:20px;padding:24px 32px 32px}
-dialog.ds-modal-gallery h2{grid-column:1;grid-row:1;align-self:center;margin:0}
+dialog.ds-modal-gallery h2{grid-column:1;grid-row:1;align-self:center;margin:0;font:400 24px/normal AvitoSansDisplay,Arial}
 dialog.ds-modal-gallery .ds-modal-close{position:static;grid-column:2;grid-row:1;align-self:center}
 dialog.ds-modal-gallery form{grid-column:1/-1}
 dialog.ds-modal-gallery::backdrop{background:#03040880}
 @media(max-width:600px){dialog.ds-modal-gallery[open]{padding:20px 28px 28px;grid-template-columns:minmax(0,1fr) 36px}}
+
+/* Shared upload form, also demonstrated in the component catalog. */
+.drop-zone{position:relative;min-height:190px;border:1px dashed #ffffff45;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer;background:#ffffff04;transition:background .2s,border-color .2s}.drop-zone input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.drop-zone strong{font-weight:400;font-size:17px}.drop-zone span{color:#999;pointer-events:none}.drop-zone small{font-size:11px;letter-spacing:0;margin-top:12px}.drop-zone:hover,.drop-zone.drag-over{background:#259cdb15;border-color:#72ceff}.drop-zone:focus-within{outline:2px solid #bfaaff;outline-offset:3px}
