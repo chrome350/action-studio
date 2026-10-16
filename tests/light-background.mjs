@@ -11,7 +11,7 @@ function scene(bg,fg,gradient=false){
  }
  return data;
 }
-for(const bg of [[255,255,255],[239,224,245],[204,239,220]]){
+for(const bg of [[255,255,255],[245,245,245],[220,220,220],[190,195,200],[250,240,218],[239,224,245],[204,239,220],[218,235,242]]){
  for(const fg of [[0,0,0],[140,25,50],[18,30,155]]){
   const input=scene(bg,fg,true),saved=input.slice(),output=gridForegroundForEffects(input,w,h);
   assert.notEqual(output,input,'light backgrounds use foreground adaptation');
@@ -54,3 +54,10 @@ const stem=scene([218,235,242],[120,40,60]);
 for(let y=48;y<h;y++)for(let x=38;x<42;x++)stem.set([30,110,130,255],(y*w+x)*4);
 const clear=gridForegroundForEffects(stem,w,h);
 assert.equal(clear[(8*w+40)*4],0,'bottom stem does not contaminate background');
+
+const framed=scene([220,220,220],[170,65,90]);
+for(let x=0;x<w;x++){framed.set([255,255,255,255],x*4);framed.set([255,255,255,255],((h-1)*w+x)*4);}
+for(let y=0;y<h;y++){framed.set([255,255,255,255],y*w*4);framed.set([255,255,255,255],(y*w+w-1)*4);}
+const metadata={};const framedOutput=gridForegroundForEffects(framed,w,h,null,metadata);
+assert.deepEqual(Array.from(metadata.background.slice((8*w+8)*4,(8*w+8)*4+3)),[220,220,220],'Thin white border does not replace the grey backdrop');
+assert.equal(framedOutput[(8*w+8)*4+3],0,'Empty grey backdrop stays outside the subject mask');
