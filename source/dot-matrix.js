@@ -92,13 +92,13 @@ function dotMatrixGeometry(source, step, contrast, profile) {
  * A prepared source reuses analysis/geometry across palette and contrast edits;
  * each result still owns its canvas so a pending frame cannot alter the old one.
  */
-export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, profile = null, colors = null, phase = null, prepared = null) {
+export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, profile = null, colors = null, phase = null, prepared = null, transparent = false) {
   const step = Math.max(4, spacing);
   const source=prepared?.data===data && prepared.width===width && prepared.height===height ? prepared : prepareDotMatrixSource(data,width,height);
   const canvas = document.createElement('canvas');
   canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, width, height);
+  if(!transparent){ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, width, height);}
   ctx.fillStyle = '#FFFFFF';
   const stops = Array.isArray(colors) ? colors.filter(c=>/^#[0-9a-f]{6}$/i.test(c)).map(c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16))) : [];
   const colorAt = t => {
@@ -111,7 +111,7 @@ export function renderDotMatrix(data, width, height, spacing = 6, contrast = 1, 
   // Broad, deforming mesh-gradient regions, inspired by the flowing video reference.
   // Geometry is prepared once. Animation repaints colours only.
   canvas.repaintGradient = (phase = null) => {
-    ctx.fillStyle='#000000';ctx.fillRect(0,0,width,height);
+    if(transparent)ctx.clearRect(0,0,width,height);else{ctx.fillStyle='#000000';ctx.fillRect(0,0,width,height);}
     const angle=(phase===null?0:phase%1)*Math.PI*2;
     const anchors=[[.12,.05,0],[.88,.15,3],[.46,.60,1],[.05,1.02,2],[1.02,.94,0]];
     const pools=phase===null||!stops.length?[]:anchors.map(([x,y,index],i)=>{

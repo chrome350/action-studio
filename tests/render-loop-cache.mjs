@@ -68,6 +68,7 @@ function harness(overrides = {}) {
     ImageData: class { constructor(data, width, height) { Object.assign(this, { data, width, height }); } },
     createGridRenderCache, createGridRenderGate, gridVideoPolicy, gridResizeMask, gridPublishVideoFrame,
     createGridEffectWorker: () => ({ available: false, status: 'disabled', run: () => Promise.resolve(null), invalidate() {}, dispose() {} }),
+    gridForegroundForEffects: data => data,
     gridAdaptiveTone() { counts.tone++; return {}; },
     gb() { counts.action++; return {}; },
     yb() { counts.actionDraw++; }, hb() {},
@@ -365,3 +366,14 @@ assert.equal(glowMotion.counts.actionDraw, stoppedDraws, 'disabled glow does not
 assert.deepEqual(prepared(glowMotion), glowPrepared, 'animation controls preserve expensive caches');
 glowMotion.dispose();
 console.log('Action animation: cached repaint, speed, still capture and disabled idle state passed.');
+// Light mixed scenes use one photographic backdrop; Action still runs its
+// original renderer, but its cell base must never grade the light backdrop.
+const lightMixed=harness({gridForegroundForEffects(data,w,h,bounds,metadata){
+ const bg=new Uint8ClampedArray(data.length),signal=new Uint8ClampedArray(data.length);
+ for(let i=0;i<data.length;i+=4){bg.set([218,235,242,255],i);signal.set([120,100,80,0],i);}
+ metadata.background=bg;return signal;
+}});
+lightMixed.render();lightMixed.tick();
+assert.equal(lightMixed.counts.actionBase,0,'light background bypasses Action base grading');
+assert.ok(lightMixed.counts.action>0,'original Action renderer remains in use');
+lightMixed.dispose();

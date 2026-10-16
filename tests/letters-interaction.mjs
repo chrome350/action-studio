@@ -29,3 +29,10 @@ events.length=0;
 drawLettersInteraction(recording,seam,true,100,45,false,32,true);
 assert.equal(events.filter(e=>e==='clip').length,2);
 console.log('Hidden grid: shared mask, background ordering and joined glyph movement passed.');
+// Animated letters restore the stationary exterior backdrop before glyphs.
+const backdrop={name:'original exterior'},order=[];
+const masked=createLettersInteraction();
+masked.cells=[{...seam.cells[0],background:'#00000000',backdrop}];
+drawLettersInteraction({...ctx,clearRect(){order.push('clear')},drawImage(image){order.push(image===backdrop?'backdrop':'glyph')}},masked,false,100,45,false,16);
+assert.deepEqual(order.slice(0,2),['clear','backdrop'],'source exterior is restored on every repaint');
+assert.ok(order.indexOf('glyph')>order.indexOf('backdrop'),'stationary background precedes moving symbols');
