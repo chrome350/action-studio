@@ -45,3 +45,65 @@ export function gridLettersMask(data,profile,contrast=1,gamma=1){
  out[i]=out[i+1]=out[i+2]=255;out[i+3]=data[i+3]*profile.coverage(adjusted)}
  return out;
 }
+
+/** Convert a light photographic backdrop into the zero-energy background expected
+ * by every effect. Palette colours are applied later and are never inverted.
+ * bounds describe the fitted/zoomed source, excluding black canvas letterboxing. */
+export function gridForegroundForEffects(data,width,height,bounds=null,metadata=null){
+ const clamp=v=>Math.max(0,Math.min(1,v));
+ const smooth=(a,b,v)=>{const t=clamp((v-a)/(b-a));return t*t*(3-2*t)};
+ const left=Math.max(0,Math.min(width-1,Math.ceil(bounds?.left??0)));
+ const top=Math.max(0,Math.min(height-1,Math.ceil(bounds?.top??0)));
+ const right=Math.max(left,Math.min(width-1,Math.floor(bounds?.right??width-1)));
+ const bottom=Math.max(top,Math.min(height-1,Math.floor(bounds?.bottom??height-1)));
+ const samples=[[],[],[]],border=[];
+ const add=(x,y)=>{const i=(y*width+x)*4;if(data[i+3]<240)return;const color=[data[i],data[i+1],data[i+2]];border.push(color);for(let c=0;c<3;c++)samples[c].push(color[c])};
+ const step=Math.max(1,Math.floor(Math.max(right-left,bottom-top)/180));
+ for(let x=left;x<=right;x+=step){add(x,top);add(x,bottom)}
+ for(let y=top;y<=bottom;y+=step){add(left,y);add(right,y)}
+ if(border.length<4)return data;
+ const median=values=>values.sort((a,b)=>a-b)[Math.floor(values.length/2)];
+ const bg=samples.map(median),light=(.2126*bg[0]+.7152*bg[1]+.0722*bg[2])/255;
+ const consistent=border.filter(color=>Math.max(...color.map((v,c)=>Math.abs(v-bg[c])))<48).length/border.length;
+ // Conservative polarity decision: preserve dark imagery byte-for-byte.
+ const borderLights=border.map(color=>(.2126*color[0]+.7152*color[1]+.0722*color[2])/255).sort((a,b)=>a-b);
+ const flatBackdrop=border.filter(color=>Math.max(...color.map((v,c)=>Math.abs(v-bg[c])))<8).length/border.length>.80;
+ const brightEdge=borderLights[Math.floor((borderLights.length-1)*.85)];
+ if((light<.55 && !(light>.32 && brightEdge>.65)) || consistent<.55)return data;
+ const patch=Math.max(1,Math.floor(Math.min(right-left+1,bottom-top+1)*.025));
+ const corner=(cx,cy,dx,dy)=>[0,1,2].map(c=>{const values=[];for(let y=0;y<patch;y++)for(let x=0;x<patch;x++)values.push(data[((cy+y*dy)*width+cx+x*dx)*4+c]);return median(values)});
+ const corners=[corner(left,top,1,1),corner(right,top,-1,1),corner(left,bottom,1,-1),corner(right,bottom,-1,-1)];
+ const horizontal=[top,bottom].map(row=>Array.from({length:width},(_,x)=>[0,1,2].map(c=>{const values=[];for(let dx=-3;dx<=3;dx++)values.push(data[(row*width+Math.max(left,Math.min(right,x+dx)))*4+c]);return median(values)})));
+ const backdrop=metadata?new Uint8ClampedArray(data.length):null;
+ const out=new Uint8ClampedArray(data.length);
+ for(let y=0;y<height;y++){
+  const edge=x=>[0,1,2].map(c=>{const values=[];for(let dy=-3;dy<=3;dy++)values.push(data[(Math.max(top,Math.min(bottom,y+dy))*width+x)*4+c]);return median(values)});
+  const fy=clamp((y-top)/Math.max(1,bottom-top));
+  const predicted=[0,1].map(side=>corners[side].map((v,c)=>v*(1-fy)+corners[side+2][c]*fy));
+  const edges=[edge(left),edge(right)];
+  const [a,b]=edges.map((color,side)=>{const distance=Math.max(...color.map((v,c)=>Math.abs(v-predicted[side][c]))),weight=1-smooth(24,64,distance);return color.map((v,c)=>v*weight+predicted[side][c]*(1-weight))});
+  for(let x=0;x<width;x++){
+   const i=(y*width+x)*4;out[i+3]=data[i+3];
+   if(x<left||x>right||y<top||y>bottom){out[i+3]=0;if(backdrop)backdrop.set([...bg,255],i);continue;}
+   const t=(x-left)/Math.max(1,right-left);
+   const background=flatBackdrop?bg:a.map((v,c)=>{
+    const bilinear=predicted[0][c]*(1-t)+predicted[1][c]*t;
+    const topExpected=corners[0][c]*(1-t)+corners[1][c]*t,bottomExpected=corners[2][c]*(1-t)+corners[3][c]*t;
+    const upper=horizontal[0][x][c],lower=horizontal[1][x][c];
+    const vertical=(Math.abs(upper-topExpected)<64?upper:topExpected)*(1-fy)+(Math.abs(lower-bottomExpected)<64?lower:bottomExpected)*fy;
+    return Math.max(0,Math.min(255,v*(1-t)+b[c]*t+vertical-bilinear));
+   });
+   if(backdrop)backdrop.set([...background,255],i);
+   const delta=Math.max(...background.map((v,c)=>Math.abs(data[i+c]-v)/Math.max(128,v,255-v)));
+   const coverage=smooth(.008,.065,delta)*data[i+3]/255;
+   out[i+3]=Math.round(255*coverage);
+   const energy=coverage>0?Math.pow(clamp(delta),.60):0;
+   const peak=Math.max(data[i],data[i+1],data[i+2]),low=Math.min(data[i],data[i+1],data[i+2]);
+   // Neutral black details become bright signal; chromatic detail retains hue.
+   const saturation=(peak-low)/Math.max(1,peak),retain=smooth(.08,.35,saturation);
+   for(let c=0;c<3;c++)out[i+c]=255*energy*((1-retain)+retain*data[i+c]/Math.max(1,peak));
+  }
+ }
+ if(metadata)metadata.background=backdrop;
+ return out;
+}

@@ -24,7 +24,7 @@ O.useLayoutEffect(() => {
   let Al = null, De = null, dotCells = [], firstRender = true;
   const qe = document.createElement("canvas"), work = document.createElement("canvas");
   qe.width = qe.height = work.width = work.height = renderSize;
-  let frameSource = null, publishedTime = 0;
+  let frameSource = null, publishedTime = 0, transparentForeground=false,effectBackdrop=null,hasTransparentLetters=false,actionCoverage=null;
   lettersMotion.current.scale = renderScale;
   let ga = performance.now(), fu = 0;
   const su = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -33,13 +33,14 @@ O.useLayoutEffect(() => {
     dotPrepared.repaintGradient(moving ? time % 2e4 / 2e4 : null);
     const context = Al.getContext("2d");
     for (const [left, top, width, height] of dotCells) {
+      if(effectBackdrop)context.drawImage(effectBackdrop,left,top,width,height,left,top,width,height);
       context.drawImage(dotPrepared, left, top, width, height, left, top, width, height);
     }
   };
   const Ae = (Mt) => {
     if (Mt.drawImage(Al, 0, 0), oe && Me) {
       const Wt = qe.getContext("2d");
-      Wt.clearRect(0, 0, renderSize, renderSize), yb(Wt, oe, su || !actionAnimate ? null : y.current, Q, Lt), Wt.globalCompositeOperation = "destination-in", Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
+      Wt.clearRect(0, 0, renderSize, renderSize), yb(Wt, oe, su || !actionAnimate ? null : y.current, Q, Lt), Wt.globalCompositeOperation = "destination-in", actionCoverage&&Wt.drawImage(actionCoverage,0,0), Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
     }
     drawLettersInteraction(Mt, lettersMotion.current, lettersInteractive, lettersRadius, lettersStrength, su, performance.now(), v, _e.current);
     if (v && b > 0) {
@@ -67,7 +68,10 @@ O.useLayoutEffect(() => {
     const output = Be.current;
     if (!output || disposed) return;
     if (output.width !== renderSize || output.height !== renderSize) output.width = output.height = renderSize;
-    Ae(output.getContext("2d", { willReadFrequently: true }));
+    const outputContext=output.getContext("2d", { willReadFrequently: true });
+    if(transparentForeground)outputContext.clearRect(0,0,renderSize,renderSize);
+    if(output.parentElement?.dataset)output.parentElement.dataset.transparentBackground=String(hasTransparentLetters);
+    Ae(outputContext);
     if (output.dataset) {
       output.dataset.gridRenderPending = "false";
       output.dataset.gridFrameReady = frameSource ? "true" : "false";
@@ -166,27 +170,74 @@ O.useLayoutEffect(() => {
       rasterContext.restore();
       return rasterContext.getImageData(0, 0, renderSize, renderSize);
     });
-    const sourceFrame = stages.get("source", [rasterFrame, Y], () => {
-      if (Y === 100) return rasterFrame;
-      const frame = new ImageData(new Uint8ClampedArray(rasterFrame.data), renderSize, renderSize), gain = Y / 100;
+    const foregroundFrame=stages.get("foreground",[rasterFrame,Je,renderSize,x],()=>{
+      if(!Je)return rasterFrame;
+      const fit=Math.min(renderSize/Je.naturalWidth,renderSize/Je.naturalHeight)*x/100;
+      const w=Je.naturalWidth*fit,h=Je.naturalHeight*fit;
+      const metadata={};
+      const data=gridForegroundForEffects(rasterFrame.data,renderSize,renderSize,{left:(renderSize-w)/2,top:(renderSize-h)/2,right:(renderSize+w)/2-1,bottom:(renderSize+h)/2-1},metadata);
+      if(data===rasterFrame.data)return rasterFrame;
+      const frame=new ImageData(data,renderSize,renderSize);frame.effectBackground=metadata.background;
+      frame.effectOriginal=new Uint8ClampedArray(rasterFrame.data);
+      for(let py=0;py<renderSize;py++)for(let px=0;px<renderSize;px++){
+        if(px<(renderSize-w)/2||px>=(renderSize+w)/2||py<(renderSize-h)/2||py>=(renderSize+h)/2){
+          const offset=(py*renderSize+px)*4;
+          frame.effectOriginal.set(metadata.background.subarray(offset,offset+4),offset);
+        }
+      }
+      return frame;
+    });
+    const adaptedForeground=foregroundFrame!==rasterFrame;
+    transparentForeground=adaptedForeground;
+    effectBackdrop=adaptedForeground?stages.get("effect-backdrop",[foregroundFrame,Y],()=>{
+      const canvas=document.createElement("canvas");canvas.width=canvas.height=renderSize;
+      const pixels=new Uint8ClampedArray(foregroundFrame.effectBackground);
+      if(Y!==100)for(let i=0;i<pixels.length;i+=4)for(let c=0;c<3;c++)pixels[i+c]*=Y/100;
+      canvas.getContext("2d").putImageData(new ImageData(pixels,renderSize,renderSize),0,0);
+      return canvas;
+    }):null;
+    actionCoverage=adaptedForeground?stages.get("action-object-coverage",[foregroundFrame],()=>{
+      const canvas=document.createElement("canvas");canvas.width=canvas.height=renderSize;
+      canvas.getContext("2d").putImageData(new ImageData(new Uint8ClampedArray(foregroundFrame.data),renderSize,renderSize),0,0);
+      return canvas;
+    }):null;
+    const lettersBackdrop=effectBackdrop;
+    const effectBackground=adaptedForeground?"#00000000":B;
+
+    const ribbonSource=adaptedForeground?null:Je;
+    const sourceFrame = stages.get("source", [foregroundFrame, Y], () => {
+      if (Y === 100) return foregroundFrame;
+      const frame = new ImageData(new Uint8ClampedArray(foregroundFrame.data), renderSize, renderSize), gain = Y / 100;
       for (let i = 0; i < frame.data.length; i += 4) frame.data[i] *= gain, frame.data[i + 1] *= gain, frame.data[i + 2] *= gain;
       return frame;
     });
+    const actionFrame=stages.get("action-original-source",[rasterFrame,Y],()=>{
+      if(Y===100)return rasterFrame;
+      const pixels=new Uint8ClampedArray(rasterFrame.data);
+      for(let i=0;i<pixels.length;i+=4)for(let c=0;c<3;c++)pixels[i+c]*=Y/100;
+      return new ImageData(pixels,renderSize,renderSize);
+    });
+    const ribbonFrame=adaptedForeground?stages.get("ribbon-colour-source",[foregroundFrame,Y],()=>{
+      const pixels=new Uint8ClampedArray(foregroundFrame.effectOriginal);
+      if(Y!==100)for(let i=0;i<pixels.length;i+=4)for(let c=0;c<3;c++)pixels[i+c]*=Y/100;
+      return new ImageData(pixels,renderSize,renderSize);
+    }):sourceFrame;
     const modes = new Set(Array.from({ length: f * s }, (_, index) => K[index]?.mode || P));
+    hasTransparentLetters=false;
     lettersMotion.current.fullFrameLetters = modes.size === 1 && modes.has("letters");
     // Keep video exposure history advancing even while Action/Ribbons is shown.
     const frameTone = Je && (videoSource || modes.has("letters") || modes.has("dotmatrix")) ? stages.get("tone", [sourceFrame], () => gridAdaptiveTone(sourceFrame.data, Je, frameTime)) : null;
     const letterColor = Je && modes.has("letters") ? stages.get("letters-color", [sourceFrame, frameTone, ...lettersColors], () => lettersColorField(sourceFrame.data, renderSize, renderSize, lettersColors, frameTone)) : null;
-    const ribbonKey = [sourceFrame, J.ribbons, ribbonCapture, ribbonBend, ribbonDirection, renderMask];
-    const actionKey = [sourceFrame, J.clean, W, j, Z, B, Q, Lt, actionClarity];
+    const ribbonKey = [ribbonFrame, J.ribbons, ribbonCapture, ribbonBend, ribbonDirection, renderMask];
+    const actionKey = [actionFrame, J.clean, W, j, Z, B, Q, Lt, actionClarity];
     const needsRibbon = Je && modes.has("ribbons"), needsAction = Je && modes.has("clean");
     let ribbonImage = needsRibbon ? stages.peek("ribbons", ribbonKey) : null;
     let actionImage = needsAction ? stages.peek("action", actionKey) : null;
     if (worker.available && (needsRibbon && !ribbonImage || needsAction && !actionImage)) {
-      const job = { generation: 0, width: renderSize, height: renderSize, rgba: sourceFrame.data };
-      if (needsAction && !actionImage) job.action = { radius: J.clean, contrast: W / 100, gamma: j, accent: Z, ink: B, intensity: Q, trail: Lt, sourceWidth: Je.naturalWidth, sourceHeight: Je.naturalHeight, clarity: actionClarity };
+      const job = { generation: 0, width: renderSize, height: renderSize, rgba: actionFrame.data };
+      if (needsAction && !actionImage) job.action = { radius:J.clean,contrast:W/100,gamma:j,accent:Z,ink:B,intensity:Q,trail:Lt,sourceWidth:Je.naturalWidth,sourceHeight:Je.naturalHeight,clarity:actionClarity };
       if (needsRibbon && !ribbonImage) {
-        const highResolution = stages.get("ribbon-source", [sourceFrame, renderMask], () => prepareRibbonSource(sourceFrame.data, renderSize, renderSize, renderMask, Je, x, Y));
+        const highResolution = stages.get("ribbon-source", [ribbonFrame, renderMask], () => prepareRibbonSource(ribbonFrame.data, renderSize, renderSize, renderMask, ribbonSource, x, Y));
         job.ribbons = { length: J.ribbons, capture: ribbonCapture, bend: ribbonBend, direction: ribbonDirection, highResolution };
       }
       const result = await worker.run(job);
@@ -196,7 +247,7 @@ O.useLayoutEffect(() => {
       if (Ft.current !== Je || gridVideoPolicy(Je, lastWork).size !== renderSize || videoSource && (!Je.complete || Je.paused && Math.abs(Je.currentTime - frameTime) > .001)) {
         Rt = false; at = requestAnimationFrame(ya); return;
       }
-      if (result?.action) actionImage = stages.set("action", actionKey, GridCleanStyle.prepareGlow(result.action.rgba, sourceFrame.data, renderSize, renderSize, W / 100, j, qf, B));
+      if (result?.action) actionImage = stages.set("action",actionKey,GridCleanStyle.prepareGlow(result.action.rgba,actionFrame.data,renderSize,renderSize,W/100,j,qf,B));
       if (result?.ribbons) {
         ribbonImage = pixelsCanvas(result.ribbons);
         ribbonImage.highResolution = pixelsCanvas(result.ribbons.highResolution);
@@ -207,12 +258,12 @@ O.useLayoutEffect(() => {
         Be.current.dataset.gridWorkerDuration = String(result.durationMs);
       }
     }
-    if (needsRibbon && !ribbonImage) ribbonImage = stages.get("ribbons", ribbonKey, () => renderRibbonStretch(sourceFrame.data, renderSize, renderSize, J.ribbons, ribbonCapture, ribbonBend, ribbonDirection, renderMask, Je, x, Y));
-    if (needsAction && !actionImage) actionImage = stages.get("action", actionKey, () => gb(sourceFrame.data, renderSize, renderSize, J.clean, W / 100, j, Z, B, Q, Lt, Je.naturalWidth, Je.naturalHeight, actionClarity));
+    if (needsRibbon && !ribbonImage) ribbonImage = stages.get("ribbons", ribbonKey, () => renderRibbonStretch(ribbonFrame.data, renderSize, renderSize, J.ribbons, ribbonCapture, ribbonBend, ribbonDirection, renderMask, ribbonSource, x, Y));
+    if (needsAction && !actionImage) actionImage=stages.get("action",actionKey,()=>gb(actionFrame.data,renderSize,renderSize,J.clean,W/100,j,Z,B,Q,Lt,Je.naturalWidth,Je.naturalHeight,actionClarity));
     ribbonExportFrame.current = ribbonImage ? { image: ribbonImage.highResolution, columns: f, rows: s, mode: P, cells: K, grid: v, color: T, opacity: b } : null;
     const dotSource = Je && modes.has("dotmatrix") ? stages.get("dot-source", [sourceFrame], () => prepareDotMatrixSource(sourceFrame.data, renderSize, renderSize)) : null;
-    dotPrepared = dotSource ? stages.get("dots", [sourceFrame, J.dotmatrix * renderScale, W, frameTone, ...dotColors], () => renderDotMatrix(sourceFrame.data, renderSize, renderSize, J.dotmatrix * renderScale, W / 100, frameTone, dotColors, null, dotSource)) : null;
-    const composition = stages.get("composition", [sourceFrame, f, s, P, K, W, j, B, Z, J.clean, J.letters, J.pixels, J.dithering, J.halftone, letterColor, ribbonImage, dotPrepared], () => {
+    dotPrepared = dotSource ? stages.get("dots", [sourceFrame, J.dotmatrix * renderScale, W, frameTone, ...dotColors], () => renderDotMatrix(sourceFrame.data, renderSize, renderSize, J.dotmatrix * renderScale, W / 100, frameTone, dotColors, null, dotSource, adaptedForeground)) : null;
+    const composition = stages.get("composition", [sourceFrame, f, s, P, K, W, j, B, Z, J.clean, J.letters, J.pixels, J.dithering, J.halftone, letterColor, ribbonImage, dotPrepared, actionFrame], () => {
       lettersMotion.current.previousCells = lettersMotion.current.cells;
       lettersMotion.current.cells = [];
       Mt.putImageData(sourceFrame, 0, 0);
@@ -231,6 +282,7 @@ O.useLayoutEffect(() => {
         }
         if ((K[kt * f + ne]?.mode || P) === "ribbons") {
           if (ribbonImage) {
+            if(effectBackdrop)Mt.drawImage(effectBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne);
             Mt.drawImage(ribbonImage, Zt, il, Ie, Ne, Zt, il, Ie, Ne);
             active && gi.push(kt * f + ne);
           }
@@ -239,6 +291,7 @@ O.useLayoutEffect(() => {
         if ((K[kt * f + ne]?.mode || P) === "dotmatrix") {
           dotRects.push([Zt, il, Ie, Ne]);
           if (dotPrepared) {
+            if(effectBackdrop)Mt.drawImage(effectBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne);
             Mt.drawImage(dotPrepared, Zt, il, Ie, Ne, Zt, il, Ie, Ne);
             active && gi.push(kt * f + ne);
           } else {
@@ -248,12 +301,21 @@ O.useLayoutEffect(() => {
           continue;
         }
         if (!Je || !visible && (K[kt * f + ne]?.mode || P) !== "clean" && (K[kt * f + ne]?.mode || P) !== "letters") {
-          Mt.fillStyle = B, Mt.fillRect(Zt, il, Ie, Ne);
+          if(effectBackdrop)Mt.drawImage(effectBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne);else {Mt.fillStyle = B;Mt.fillRect(Zt, il, Ie, Ne);}
           continue;
         }
         active && gi.push(kt * f + ne);
         const Xl = K[kt * f + ne], du = Xl && ci.some((yi) => yi.mode === Xl.mode) ? Xl : { mode: P }, ol = { ...du, size: J[du.mode] * renderScale };
-        ol.mode === "pixels" ? db(cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j) : ol.mode === "dithering" ? fb(cl.data, Ie, Ne, B, Z, W / 100, j) : ol.mode === "clean" && GridCleanStyle.applyBase(cl.data, B, W / 100, j), ol.mode === "clean" && (Vl.rect(Zt, il, Ie, Ne), be = true), ol.mode === "halftone" || ol.mode === "letters" ? (ke.width = Ie, ke.height = Ne, ol.mode === "letters" ? mb(Oe, cl.data, Ie, Ne, ol.size, B, Z, W / 100, j, Zt, il, letterColor) : sb(Oe, cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j), ol.mode === "letters" && cacheLettersCell(lettersMotion.current, ke, Zt, il, ol.size, B), Mt.drawImage(ke, Zt, il)) : Mt.putImageData(cl, Zt, il);
+        // Action's feathered cell mask reveals its base at the boundary. Keep
+        // that base on the original input too, rather than the light-source signal.
+        if(ol.mode==="clean"&&adaptedForeground){
+          for(let row=0;row<Ne;row++){
+            const start=((il+row)*renderSize+Zt)*4;
+            cl.data.set(foregroundFrame.effectBackground.subarray(start,start+Ie*4),row*Ie*4);
+            if(Y!==100)for(let i=row*Ie*4;i<(row+1)*Ie*4;i+=4)for(let c=0;c<3;c++)cl.data[i+c]*=Y/100;
+          }
+        }
+        ol.mode === "pixels" ? db(cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j) : ol.mode === "dithering" ? fb(cl.data, Ie, Ne, B, Z, W / 100, j) : ol.mode === "clean" && !adaptedForeground && GridCleanStyle.applyBase(cl.data, B, W / 100, j), ol.mode === "clean" && (Vl.rect(Zt, il, Ie, Ne), be = true), ol.mode === "halftone" || ol.mode === "letters" ? (ke.width = Ie, ke.height = Ne, ol.mode === "letters" ? mb(Oe, cl.data, Ie, Ne, ol.size, effectBackground, Z, W / 100, j, Zt, il, letterColor) : sb(Oe, cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j), ol.mode === "letters" && cacheLettersCell(lettersMotion.current, ke, Zt, il, ol.size, effectBackground, lettersBackdrop), adaptedForeground&&ol.mode==="letters"&&(Mt.clearRect(Zt,il,Ie,Ne),lettersBackdrop&&Mt.drawImage(lettersBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne)), Mt.drawImage(ke, Zt, il)) : Mt.putImageData(cl, Zt, il);
       }
       const base = document.createElement("canvas"), mask = document.createElement("canvas");
       base.width = base.height = mask.width = mask.height = renderSize;

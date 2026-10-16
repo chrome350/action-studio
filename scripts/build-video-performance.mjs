@@ -20,6 +20,8 @@ for(const name of ['assets/index-BwYdjEfo.js','Grid Studio.html']){
  s=s.replace('ctx.drawImage(Be.current,0,0);','ctx.drawImage(Be.current,0,0,600,600);');
  s=s.replace('async function va(){const at=Ke.current;', 'async function va(){if(Ft.current?.tagName==="VIDEO"){if(!(await videoTools.ensureFullFrame()))return;}const at=Ke.current;');
  s=s.replace('async function va(){if(Ft.current?.tagName==="VIDEO"){if(!(await videoTools.ensureFullFrame()))return;}const at=Ke.current;', 'async function va(){if(Ft.current?.tagName==="VIDEO"){if(!(await videoTools.ensureFullFrame()))return;}await waitForGridRender();const at=Ke.current;');
+ // A fading previous effect must not put an opaque backdrop back into a transparent PNG.
+ s=s.replace('R>0&&H.current&&(Rt.globalAlpha=', 'R>0&&H.current&&Be.current?.parentElement?.dataset.transparentBackground!=="true"&&(Rt.globalAlpha=');
  // Space uses refs so its initial event listener also sees later source changes.
  s=s.replace('if(_e.current)media.pause();else media.play().catch(()=>{})','if(_e.current){media.pause();media.gridFullFrame=true;media.gridNeedsFullFrame=true}else{media.gridFullFrame=false;media.play().catch(()=>{})}');
  await fs.writeFile(file,s);

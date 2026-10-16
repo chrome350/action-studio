@@ -107,3 +107,8 @@ Worker встроен в автономный HTML и запускается ч�
 Проверки: `node tests/effect-hotpaths.mjs`, `node tests/dot-matrix-prepared.mjs`, `node tests/letters-idle.mjs`, `node tests/adaptive-tone-exact.mjs`, `node tests/render-loop-cache.mjs`. Они проверяют точность пикселей и команд отрисовки, сброс зависимых этапов и сохранение готовых этапов при независимых изменениях.
 
 В локальном браузерном сравнении с предыдущей Worker-версией совпали все 58 кадров после изменений настроек и пять PNG 1080×1080, включая смешанную сетку. Примеры времени до готового кадра: длина Ribbons — 1387 → 770 мс, яркость Ribbons — 1614 → 918 мс, палитры Dot Matrix — 27–45 → 15–20 мс, радиус Letters — 29 → 8 мс, яркость смешанной сетки — 2391 → 1495 мс. Это замеры конкретного исходника и браузера; тяжёлые эффекты по-прежнему требуют пересчёта.
+
+
+## Light source backgrounds
+
+Letters and Dot Matrix use automatic foreground preparation for white, pastel and smoothly shaded light backgrounds. The signal measures contrast against the fitted image border, so surrounding light areas do not become letters or dots. Faint pale details remain visible; selected palette colours are never inverted. Both effects composite over the inferred original white/pastel backdrop and keep the final image opaque, including exports. Ribbons deforms the original colour image and preserves its light backdrop. Action uses the original repository rendering, with no light-background adaptation. Dark backgrounds retain their original processing and settings. This is background-aware contrast adaptation, not semantic segmentation of complex photographic scenes.

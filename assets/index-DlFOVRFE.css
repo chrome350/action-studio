@@ -157,6 +157,10 @@ header{flex-direction:row;justify-content:space-between;align-items:center}
 header .brand-logo{display:block;height:40px;width:auto;flex-shrink:0}
 @media(max-width:960px){header{flex-direction:row;justify-content:space-between;align-items:center}header .brand-logo{height:32px}}
 /* grid-header-logos:end */
+
+
+/* Preview only: checkerboard is never painted into exported image pixels. */
+.stage[data-transparent-background="true"]{background-color:#f4f4f4;background-image:linear-gradient(45deg,#dedede 25%,transparent 25%),linear-gradient(-45deg,#dedede 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#dedede 75%),linear-gradient(-45deg,transparent 75%,#dedede 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
 /* grid-design-system:start */
 :root{
  --ds-font-text:AvitoSansText,sans-serif;
@@ -258,6 +262,9 @@ aside,.stage,.bottom-actions,aside .panel-title,aside .panel-title.is-scrolled{b
 
 aside .grid-visibility svg{width:18px;height:18px}
 /* grid-flat-panels:end */
+
+/* Preview only: checkerboard is never painted into exported image pixels. */
+.stage[data-transparent-background="true"]{background-color:#f4f4f4;background-image:linear-gradient(45deg,#dedede 25%,transparent 25%),linear-gradient(-45deg,#dedede 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#dedede 75%),linear-gradient(-45deg,transparent 75%,#dedede 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
 
 
 /* grid-empty-state:start */

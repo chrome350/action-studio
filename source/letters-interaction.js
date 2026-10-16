@@ -2,7 +2,7 @@
 export function createLettersInteraction() {
   return {pointer:null, cells:[], last:0};
 }
-export function cacheLettersCell(state, canvas, x, y, size, background) {
+export function cacheLettersCell(state, canvas, x, y, size, background, backdrop=null) {
   const scale=state.scale||1;
   const previous=state.previousCells?.find(cell=>Math.abs(cell.x/(cell.scale||1)-x/scale)<2&&Math.abs(cell.y/(cell.scale||1)-y/scale)<2&&Math.abs(cell.size/(cell.scale||1)-size/scale)<.01);
   const image=previous?.image||document.createElement('canvas');
@@ -10,7 +10,7 @@ export function cacheLettersCell(state, canvas, x, y, size, background) {
   const ctx=image.getContext('2d');ctx.clearRect(0,0,image.width,image.height);ctx.drawImage(canvas,0,0);
   // Transparent tile backgrounds prevent moving letters from erasing neighbours.
   const pixels=ctx.getImageData(0,0,image.width,image.height),rgb=[1,3,5].map(i=>parseInt(background.slice(i,i+2),16));
-  for(let i=0;i<pixels.data.length;i+=4)if(rgb.every((v,c)=>pixels.data[i+c]===v))pixels.data[i+3]=0;
+  for(let i=0;i<pixels.data.length;i+=4)if(background!=="#00000000"&&rgb.every((v,c)=>pixels.data[i+c]===v))pixels.data[i+3]=0;
   ctx.putImageData(pixels,0,0);
   ctx.font=`600 ${Math.max(2,size)}px "SFMono-Regular", Menlo, Consolas, monospace`;
   const dx=ctx.measureText('M').width+Math.max(2,size)*.14,dy=Math.max(2,size)*1.4;
@@ -25,7 +25,7 @@ export function cacheLettersCell(state, canvas, x, y, size, background) {
   }
   // These integer tiles partition the whole bitmap without gaps or overlaps.
   // Only cells prepared here may use the equivalent single-bitmap draw below.
-  state.cells.push({image,x,y,size,scale,tiles,background,completeTiles:true});
+  state.cells.push({image,x,y,size,scale,tiles,background,backdrop,completeTiles:true});
 }
 export function drawLettersInteraction(ctx,state,enabled,radius,strength,reduced,now,gridVisible=true,frozen=false) {
   const dt=Math.min(2,Math.max(.1,(now-(state.last||now-16.67))/16.67));state.last=now;
@@ -34,7 +34,11 @@ export function drawLettersInteraction(ctx,state,enabled,radius,strength,reduced
   const pointer=enabled&&!reduced&&state.pointer?{...state.pointer,x:state.pointer.x*scale,y:state.pointer.y*scale}:null;
   // Clear every cell before drawing: a later cell must not erase a neighbour's letters.
   for(const cell of state.cells){
-    ctx.fillStyle=cell.background;ctx.fillRect(cell.x,cell.y,cell.image.width,cell.image.height);
+    if(cell.background==="#00000000"){
+      ctx.clearRect(cell.x,cell.y,cell.image.width,cell.image.height);
+      if(cell.backdrop)ctx.drawImage(cell.backdrop,cell.x,cell.y,cell.image.width,cell.image.height,cell.x,cell.y,cell.image.width,cell.image.height);
+    }
+    else{ctx.fillStyle=cell.background;ctx.fillRect(cell.x,cell.y,cell.image.width,cell.image.height);}
   }
   ctx.save();
   if(!gridVisible){
