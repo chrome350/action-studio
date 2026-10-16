@@ -71,7 +71,7 @@ function harness(overrides = {}) {
     gridForegroundForEffects: data => data,
     gridAdaptiveTone() { counts.tone++; return {}; },
     gb() { counts.action++; return {}; },
-    yb() { counts.actionDraw++; }, hb() {},
+    yb() { counts.actionDraw++; }, hb() { counts.cellMaskBlur=(counts.cellMaskBlur||0)+1; },
     qf() {},
     GridCleanStyle: { prepareGlow() { return { image: canvas() }; }, applyBase(data) { counts.actionBase++; counts.actionBasePixel=Array.from(data.slice(0,4)); } },
     lettersColorField() { counts.letters++; return {}; },
@@ -374,9 +374,15 @@ const lightMixed=harness({gridForegroundForEffects(data,w,h,bounds,metadata){
  metadata.background=bg;return signal;
 }});
 lightMixed.render();lightMixed.tick();
+assert.equal(lightMixed.counts.cellMaskBlur||0,0,"Shared light paper has no feathered rectangular cell shadows");
+assert.equal(lightMixed.counts.action,2,"Subject and shared paper each prepare Action once");
 assert.ok(lightMixed.counts.actionBase>0,'light Action retains original base grading');
 assert.ok(lightMixed.counts.action>0,'original Action renderer remains in use');
 assert.deepEqual(lightMixed.counts.actionBasePixel,[128,128,128,128],'Action grades original pixels, never the inferred pastel backdrop');
 lightMixed.render({Y:50});lightMixed.tick();
 assert.deepEqual(lightMixed.counts.actionBasePixel,[64,64,64,128],'light Action applies brightness exactly once');
 lightMixed.dispose();
+
+const darkCells=harness();
+assert.ok(darkCells.counts.cellMaskBlur>0,'Dark composition retains main cell masks');
+darkCells.dispose();

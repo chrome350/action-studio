@@ -24,7 +24,7 @@ O.useLayoutEffect(() => {
   let Al = null, De = null, dotCells = [], firstRender = true;
   const qe = document.createElement("canvas"), work = document.createElement("canvas");
   qe.width = qe.height = work.width = work.height = renderSize;
-  let frameSource = null, publishedTime = 0, transparentForeground=false,effectBackdrop=null,hasTransparentLetters=false;
+  let frameSource = null, publishedTime = 0, transparentForeground=false,effectBackdrop=null,hasTransparentLetters=false,sharedGlow=null;
   lettersMotion.current.scale = renderScale;
   let ga = performance.now(), fu = 0;
   const su = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -33,11 +33,16 @@ O.useLayoutEffect(() => {
     dotPrepared.repaintGradient(moving ? time % 2e4 / 2e4 : null);
     const context = Al.getContext("2d");
     for (const [left, top, width, height] of dotCells) {
-      if(effectBackdrop)context.drawImage(effectBackdrop,left,top,width,height,left,top,width,height);
+      if(sharedGlow)context.clearRect(left,top,width,height);else if(effectBackdrop)context.drawImage(effectBackdrop,left,top,width,height,left,top,width,height);
       context.drawImage(dotPrepared, left, top, width, height, left, top, width, height);
     }
   };
   const Ae = (Mt) => {
+    if(sharedGlow&&effectBackdrop){
+      const paper=effectBackdrop.getContext("2d");paper.clearRect(0,0,renderSize,renderSize);
+      yb(paper,sharedGlow,su||!actionAnimate?null:y.current,Q,Lt);
+      Mt.drawImage(effectBackdrop,0,0);
+    }
     if (Mt.drawImage(Al, 0, 0), oe && Me) {
       const Wt = qe.getContext("2d");
       Wt.clearRect(0, 0, renderSize, renderSize), yb(Wt, oe, su || !actionAnimate ? null : y.current, Q, Lt), Wt.globalCompositeOperation = "destination-in", Wt.drawImage(De, 0, 0), Wt.globalCompositeOperation = "source-over", Mt.save(), Mt.clip(Me), Mt.globalCompositeOperation = "source-over", Mt.drawImage(qe, 0, 0), Mt.restore();
@@ -215,6 +220,7 @@ O.useLayoutEffect(() => {
     const ribbonFrame=adaptedForeground?stages.get("ribbon-colour-source",[foregroundFrame,Y],()=>{
       const pixels=new Uint8ClampedArray(foregroundFrame.effectOriginal);
       if(Y!==100)for(let i=0;i<pixels.length;i+=4)for(let c=0;c<3;c++)pixels[i+c]*=Y/100;
+      for(let i=0;i<pixels.length;i+=4)pixels[i+3]=foregroundFrame.data[i+3];
       return new ImageData(pixels,renderSize,renderSize);
     }):sourceFrame;
     const modes = new Set(Array.from({ length: f * s }, (_, index) => K[index]?.mode || P));
@@ -222,6 +228,11 @@ O.useLayoutEffect(() => {
     lettersMotion.current.fullFrameLetters = modes.size === 1 && modes.has("letters");
     // Keep video exposure history advancing even while Action/Ribbons is shown.
     const frameTone = Je && (videoSource || modes.has("letters") || modes.has("dotmatrix")) ? stages.get("tone", [sourceFrame], () => gridAdaptiveTone(sourceFrame.data, Je, frameTime)) : null;
+    sharedGlow=adaptedForeground&&modes.has("clean")&&modes.size>1?stages.get("shared-action-paper",[foregroundFrame,Y,J.clean,W,j,Z,B,Q,Lt,actionClarity],()=>{
+      const pixels=new Uint8ClampedArray(foregroundFrame.effectBackground);
+      if(Y!==100)for(let i=0;i<pixels.length;i+=4)for(let c=0;c<3;c++)pixels[i+c]*=Y/100;
+      return gb(pixels,renderSize,renderSize,J.clean,W/100,j,Z,B,Q,Lt,Je.naturalWidth,Je.naturalHeight,actionClarity);
+    }):null;
     const letterColor = Je && modes.has("letters") ? stages.get("letters-color", [sourceFrame, frameTone, ...lettersColors], () => lettersColorField(sourceFrame.data, renderSize, renderSize, lettersColors, frameTone)) : null;
     const ribbonKey = [ribbonFrame, J.ribbons, ribbonCapture, ribbonBend, ribbonDirection, renderMask];
     const actionKey = [actionFrame, J.clean, W, j, Z, B, Q, Lt, actionClarity];
@@ -258,7 +269,7 @@ O.useLayoutEffect(() => {
     ribbonExportFrame.current = ribbonImage ? { image: ribbonImage.highResolution, columns: f, rows: s, mode: P, cells: K, grid: v, color: T, opacity: b } : null;
     const dotSource = Je && modes.has("dotmatrix") ? stages.get("dot-source", [sourceFrame], () => prepareDotMatrixSource(sourceFrame.data, renderSize, renderSize)) : null;
     dotPrepared = dotSource ? stages.get("dots", [sourceFrame, J.dotmatrix * renderScale, W, frameTone, ...dotColors], () => renderDotMatrix(sourceFrame.data, renderSize, renderSize, J.dotmatrix * renderScale, W / 100, frameTone, dotColors, null, dotSource, adaptedForeground)) : null;
-    const composition = stages.get("composition", [sourceFrame, f, s, P, K, W, j, B, Z, J.clean, J.letters, J.pixels, J.dithering, J.halftone, letterColor, ribbonImage, dotPrepared, actionFrame], () => {
+    const composition = stages.get("composition", [sourceFrame, f, s, P, K, W, j, B, Z, J.clean, J.letters, J.pixels, J.dithering, J.halftone, letterColor, ribbonImage, dotPrepared, actionFrame, sharedGlow], () => {
       lettersMotion.current.previousCells = lettersMotion.current.cells;
       lettersMotion.current.cells = [];
       Mt.putImageData(sourceFrame, 0, 0);
@@ -277,7 +288,7 @@ O.useLayoutEffect(() => {
         }
         if ((K[kt * f + ne]?.mode || P) === "ribbons") {
           if (ribbonImage) {
-            if(effectBackdrop)Mt.drawImage(effectBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne);
+            if(sharedGlow)Mt.clearRect(Zt,il,Ie,Ne);else if(effectBackdrop)Mt.drawImage(effectBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne);
             Mt.drawImage(ribbonImage, Zt, il, Ie, Ne, Zt, il, Ie, Ne);
             active && gi.push(kt * f + ne);
           }
@@ -286,7 +297,7 @@ O.useLayoutEffect(() => {
         if ((K[kt * f + ne]?.mode || P) === "dotmatrix") {
           dotRects.push([Zt, il, Ie, Ne]);
           if (dotPrepared) {
-            if(effectBackdrop)Mt.drawImage(effectBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne);
+            if(sharedGlow)Mt.clearRect(Zt,il,Ie,Ne);else if(effectBackdrop)Mt.drawImage(effectBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne);
             Mt.drawImage(dotPrepared, Zt, il, Ie, Ne, Zt, il, Ie, Ne);
             active && gi.push(kt * f + ne);
           } else {
@@ -296,7 +307,7 @@ O.useLayoutEffect(() => {
           continue;
         }
         if (!Je || !visible && (K[kt * f + ne]?.mode || P) !== "clean" && (K[kt * f + ne]?.mode || P) !== "letters") {
-          if(effectBackdrop)Mt.drawImage(effectBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne);else {Mt.fillStyle = B;Mt.fillRect(Zt, il, Ie, Ne);}
+          if(sharedGlow)Mt.clearRect(Zt,il,Ie,Ne);else if(effectBackdrop)Mt.drawImage(effectBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne);else {Mt.fillStyle = B;Mt.fillRect(Zt, il, Ie, Ne);}
           continue;
         }
         active && gi.push(kt * f + ne);
@@ -310,14 +321,15 @@ O.useLayoutEffect(() => {
             cl.data.set(actionFrame.data.subarray(start,start+Ie*4),row*Ie*4);
           }
         }
-        ol.mode === "pixels" ? db(cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j) : ol.mode === "dithering" ? fb(cl.data, Ie, Ne, B, Z, W / 100, j) : ol.mode === "clean" && GridCleanStyle.applyBase(cl.data, B, W / 100, j), ol.mode === "clean" && (Vl.rect(Zt, il, Ie, Ne), be = true), ol.mode === "halftone" || ol.mode === "letters" ? (ke.width = Ie, ke.height = Ne, ol.mode === "letters" ? mb(Oe, cl.data, Ie, Ne, ol.size, effectBackground, Z, W / 100, j, Zt, il, letterColor) : sb(Oe, cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j), ol.mode === "letters" && cacheLettersCell(lettersMotion.current, ke, Zt, il, ol.size, effectBackground, lettersBackdrop), adaptedForeground&&ol.mode==="letters"&&(Mt.clearRect(Zt,il,Ie,Ne),lettersBackdrop&&Mt.drawImage(lettersBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne)), Mt.drawImage(ke, Zt, il)) : Mt.putImageData(cl, Zt, il);
+        ol.mode === "pixels" ? db(cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j) : ol.mode === "dithering" ? fb(cl.data, Ie, Ne, B, Z, W / 100, j) : ol.mode === "clean" && GridCleanStyle.applyBase(cl.data, B, W / 100, j), ol.mode === "clean" && (Vl.rect(Zt, il, Ie, Ne), be = true), ol.mode === "halftone" || ol.mode === "letters" ? (ke.width = Ie, ke.height = Ne, ol.mode === "letters" ? mb(Oe, cl.data, Ie, Ne, ol.size, effectBackground, Z, W / 100, j, Zt, il, letterColor) : sb(Oe, cl.data, Ie, Ne, 1, 1, ol.size, B, Z, W / 100, j), ol.mode === "letters" && cacheLettersCell(lettersMotion.current, ke, Zt, il, ol.size, effectBackground, lettersBackdrop), adaptedForeground&&ol.mode==="letters"&&(Mt.clearRect(Zt,il,Ie,Ne),!sharedGlow&&lettersBackdrop&&Mt.drawImage(lettersBackdrop,Zt,il,Ie,Ne,Zt,il,Ie,Ne)), Mt.drawImage(ke, Zt, il)) : Mt.putImageData(cl, Zt, il);
+        if(sharedGlow&&ol.mode==="clean")Mt.clearRect(Zt,il,Ie,Ne);
       }
       const base = document.createElement("canvas"), mask = document.createElement("canvas");
       base.width = base.height = mask.width = mask.height = renderSize;
       base.getContext("2d").drawImage(work, 0, 0);
       if (be) {
         const kt = mask.getContext("2d");
-        kt.clearRect(0, 0, renderSize, renderSize), kt.fillStyle = "#fff", kt.fill(Vl), hb(mask, J.clean * 0.3 * renderScale);
+        kt.clearRect(0, 0, renderSize, renderSize), kt.fillStyle = "#fff", kt.fill(Vl), !sharedGlow&&hb(mask, J.clean * 0.3 * renderScale);
         const ne = kt.getImageData(0, 0, renderSize, renderSize);
         for (let Zt = 3; Zt < ne.data.length; Zt += 4) ne.data[Zt] = Math.max(0, (ne.data[Zt] - 128) * 2);
         kt.putImageData(ne, 0, 0);
