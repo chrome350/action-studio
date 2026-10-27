@@ -1,0 +1,59 @@
+{
+  "01 — База": {
+    "input": null,
+    "output": "step1.html",
+    "new_attachments": [
+      "AvitoSansDisplay-Regular.woff",
+      "AvitoSansText-Regular.woff2",
+      "AvitoSansTextMono-Regular.woff2",
+      "action-wordmark.svg",
+      "avito-wordmark.svg",
+      "buttons.css",
+      "design-system-guide.txt",
+      "empty-state.css",
+      "fields.css",
+      "flowers.png",
+      "light-background.png",
+      "panels.css",
+      "quality-rules.txt",
+      "reference-desktop.png",
+      "reference-mobile.png",
+      "rendering-contract.txt",
+      "sliders.css",
+      "specification.txt",
+      "tokens.css",
+      "typography.css"
+    ]
+  },
+  "02 — Статичный Action": {
+    "input": "step1.html участника",
+    "output": "step2.html",
+    "new_attachments": [
+      "action-animation.js",
+      "action-core.js",
+      "action-rendering-contract.txt",
+      "expected-default.png",
+      "expected-light.png",
+      "foreground-core.js",
+      "light-background-contract.txt"
+    ]
+  },
+  "03 — Анимация Action": {
+    "input": "step2.html участника",
+    "output": "step3.html",
+    "new_attachments": [
+      "animation-contract.txt",
+      "checkboxes.css"
+    ]
+  },
+  "04 — Ribbons": {
+    "input": "step3.html участника",
+    "output": "step4.html",
+    "new_attachments": [
+      "reference-ribbons-desktop.png",
+      "reference-ribbons-mobile.png",
+      "ribbons-contract.txt",
+      "ribbons-core.js"
+    ]
+  }
+}
