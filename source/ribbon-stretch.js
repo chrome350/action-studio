@@ -195,7 +195,7 @@ export function prepareRibbonSource(data,width,height,mask,source=null,zoom=100,
   const ctx=high.getContext('2d');if(source){ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);}
   if(source){
     ctx.save();ctx.translate(w/2,h/2);ctx.scale(zoom/100,zoom/100);ctx.translate(-w/2,-h/2);
-    const fit=Math.min(w/source.naturalWidth,h/source.naturalHeight),sw=source.naturalWidth*fit,sh=source.naturalHeight*fit;
+    const fit=Math.max(w/source.naturalWidth,h/source.naturalHeight),sw=source.naturalWidth*fit,sh=source.naturalHeight*fit;
     ctx.drawImage(source,(w-sw)/2,(h-sh)/2,sw,sh);ctx.restore();
   }else{
     const small=document.createElement('canvas');small.width=width;small.height=height;

@@ -177,7 +177,7 @@ O.useLayoutEffect(() => {
       const rasterContext = raster.getContext("2d");
       rasterContext.fillStyle = "#000", rasterContext.fillRect(0, 0, renderSize, renderSize), rasterContext.save(), rasterContext.translate(renderSize / 2, renderSize / 2), rasterContext.scale(x / 100, x / 100), rasterContext.translate(-renderSize / 2, -renderSize / 2);
       if (Je) {
-        const fit = Math.min(renderSize / Je.naturalWidth, renderSize / Je.naturalHeight), width = Je.naturalWidth * fit, height = Je.naturalHeight * fit;
+        const fit = Math.max(renderSize / Je.naturalWidth, renderSize / Je.naturalHeight), width = Je.naturalWidth * fit, height = Je.naturalHeight * fit;
         rasterContext.drawImage(Je, (renderSize - width) / 2, (renderSize - height) / 2, width, height);
       }
       rasterContext.restore();
@@ -185,7 +185,7 @@ O.useLayoutEffect(() => {
     });
     const foregroundFrame=stages.get("foreground",[rasterFrame,Je,renderSize,x],()=>{
       if(!Je)return rasterFrame;
-      const fit=Math.min(renderSize/Je.naturalWidth,renderSize/Je.naturalHeight)*x/100;
+      const fit=Math.max(renderSize/Je.naturalWidth,renderSize/Je.naturalHeight)*x/100;
       const w=Je.naturalWidth*fit,h=Je.naturalHeight*fit;
       const metadata={};
       const data=gridForegroundForEffects(rasterFrame.data,renderSize,renderSize,{left:(renderSize-w)/2,top:(renderSize-h)/2,right:(renderSize+w)/2-1,bottom:(renderSize+h)/2-1},metadata);
