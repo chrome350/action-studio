@@ -1,0 +1,22 @@
+:root{
+ --ds-font-text:AvitoSansText,sans-serif;
+ --ds-font-number:AvitoSansTextMono,monospace;
+ --ds-label-size:10px;
+ --ds-input-size:10px;
+ --ds-text:#fff;
+ --ds-text-muted:#bcbcbc;
+ --ds-accent:#6500d8;
+ --ds-accent-hover:#760be8;
+ --ds-focus:#c98aff;
+ --ds-field:#222424;
+ --ds-control-height:34px;
+ --ds-radius-control:9px;
+ --ds-radius-pill:999px;
+ --ds-checkbox-gap:6px;
+ --ds-slider-label-width:63px;
+ --ds-slider-value-width:48px;
+ --ds-slider-gap:16px;
+ --ds-icon-size:16px;
+ --ds-icon-eye-size:18px;
+}
+

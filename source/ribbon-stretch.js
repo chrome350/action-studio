@@ -49,8 +49,11 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
     const consistent=Math.max(...edges[0].map((v,c)=>Math.abs(v-edges[1][c])))<60;
     for(let x=0;x<width;x++) {
       const p=y*width+x,i=p*4,t=clamp((x-left)/Math.max(1,right-left),0,1);
-      const expected=consistent?edges[0].map((v,c)=>v*(1-t)+edges[1][c]*t):bg;
-      const delta=Math.max(...expected.map((v,c)=>Math.abs(data[i+c]-v)));
+      // Scalar channels avoid two temporary arrays per source pixel.
+      const r=consistent?edges[0][0]*(1-t)+edges[1][0]*t:bg[0];
+      const g=consistent?edges[0][1]*(1-t)+edges[1][1]*t:bg[1];
+      const b=consistent?edges[0][2]*(1-t)+edges[1][2]*t:bg[2];
+      const delta=Math.max(Math.abs(data[i]-r),Math.abs(data[i+1]-g),Math.abs(data[i+2]-b));
       foreground[p]=(x<left||x>right||y<topEdge||y>bottomEdge)?0:smooth((delta-4)/18)*(data[i+3]/255);
     }
   }
@@ -121,7 +124,16 @@ export function ribbonPixels(data, width, height, length=75, capture=8, bend=30,
     const v=clamp(y-top,0,fitted.length-1),a=Math.floor(v),b=Math.min(fitted.length-1,a+1),t=v-a;
     return [fitted[a][0]*(1-t)+fitted[b][0]*t,fitted[a][1]*(1-t)+fitted[b][1]*t,1];
   }
-  for(let y=0;y<height;y++)for(let u=firstU;u<=lastU;u++) {
+  // For 0..100% bend, breadth <= 1 + .22*turn; drift and curl
+  // together are bounded by turn*(abs(heading)*width*.14 + span*.185).
+  // Outside this interval both the starting y and every inverse iterate
+  // remain outside the surface. Skip only pixels the old solver rejects.
+  const turnBound=bend/100;
+  const extent=span/2*(1+.22*turnBound)+turnBound*(Math.abs(heading)*width*.14+span*.185);
+  const bounded=bend>=0&&bend<=100;
+  const firstY=bounded?Math.max(0,Math.floor(center-extent)-1):0;
+  const lastY=bounded?Math.min(height-1,Math.ceil(center+extent)+1):height-1;
+  for(let y=firstY;y<=lastY;y++)for(let u=firstU;u<=lastU;u++) {
     const dest=pixel(u,y),selected=mask[dest]/255*smooth(distance[dest]/Math.max(1,width*.012));
     // Unpainted object pixels (including centre and stems) remain exact.
     if(foreground[dest]>=1 && !selected)continue;

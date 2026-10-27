@@ -1,0 +1,26 @@
+/* The existing liquid button, shared by export, upload and future actions. */
+:is(.bottom-actions,.empty-stage,.ds-actions,.ds-modal,aside .panel-section) .liquid-button{
+ display:inline-flex;isolation:isolate;position:relative;overflow:hidden;
+ align-items:center;justify-content:center;gap:9px;height:40px;padding:0 20px;
+ border:0;border-radius:var(--ds-radius-pill);background:transparent;color:var(--ds-text);
+ font-family:var(--ds-font-text);font-size:12px;font-weight:400;line-height:16px;
+ cursor:pointer;box-shadow:0 2px 5px #0003,0 0 0 1px #0003;
+}
+:is(.bottom-actions,.empty-stage,.ds-actions,.ds-modal,aside .panel-section) .liquid-button-primary{background:var(--ds-accent)}
+:is(.bottom-actions,.empty-stage,.ds-actions,.ds-modal,aside .panel-section) .liquid-button-primary:hover{background:var(--ds-accent-hover)}
+.liquid-button:disabled{opacity:.4;cursor:default}
+.liquid-button:focus-visible{outline:2px solid var(--ds-focus);outline-offset:3px}
+.liquid-button svg{width:var(--ds-icon-size);height:var(--ds-icon-size)}
+.liquid-button-lens,.liquid-button-surface{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
+.liquid-button-lens{z-index:0;background:linear-gradient(150deg,#ffffff1c,#ffffff06 45%,#ffffff12);backdrop-filter:blur(4px) saturate(1.6)}
+.liquid-button-surface{z-index:1;background:linear-gradient(#ffffff18,#ffffff04 45%,#00000012);box-shadow:inset 0 1px 1px #ffffff8c,inset 1px 0 2px #ffffff40,inset -1px 0 2px #ffffff40,inset 0 -1px 1px #0009,inset 0 2px 5px #ffffff18,inset 0 -3px 6px #ffffff12}
+.liquid-button-content{position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;gap:inherit}
+@media(max-width:960px){:is(.bottom-actions,.empty-stage,.ds-actions,.ds-modal,aside .panel-section) .liquid-button{height:44px;padding:0 12px;gap:6px}}
+
+/* Icon actions: one borderless surface; preserve each control’s hit area. */
+:is(button.ds-icon-button,aside .panel-reset,aside .replace-image,aside .grid-visibility,.gradient-popup-heading button,dialog .dialog-close,dialog.ds-modal .ds-modal-close,#detail #close,button.like-button){border-color:transparent;box-shadow:none;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+:is(button.ds-icon-button,aside .panel-reset,aside .replace-image,aside .grid-visibility,.gradient-popup-heading button,dialog .dialog-close,dialog.ds-modal .ds-modal-close,#detail #close,button.like-button):hover{background:#ffffff0c}
+:is(button.ds-icon-button,aside .panel-reset,aside .replace-image,aside .grid-visibility,.gradient-popup-heading button,dialog .dialog-close,dialog.ds-modal .ds-modal-close,#detail #close,button.like-button):focus:not(:focus-visible){outline:none}
+:is(button.ds-icon-button,aside .panel-reset,aside .replace-image,aside .grid-visibility,.gradient-popup-heading button,dialog .dialog-close,dialog.ds-modal .ds-modal-close,#detail #close,button.like-button):focus-visible{outline:2px solid var(--ds-focus);outline-offset:2px}
+button.ds-icon-button{display:inline-grid;place-items:center;width:36px;height:36px;padding:0;border:0;border-radius:9px;color:var(--ds-text);cursor:pointer}
+button.ds-icon-button svg{width:16px;height:16px}

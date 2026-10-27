@@ -1,0 +1,30 @@
+СВЕТЛЫЕ ФОНЫ — origin/main e8f89db, 27.10.2026
+Этот контракт заменяет инструкции о светлых фонах предыдущей версии d1da1a3. Он обязателен на шагах2–4. Шаг1 — обычное фото с яркостью и контрастом, без коррекции эффекта.
+
+1. Подготовка общего фона
+Сохрани rasterFrame1080 после вписывания и масштабирования, ДО яркости. fit=max(1080/image.naturalWidth,1080/image.naturalHeight)*scale/100; w=image.naturalWidth*fit;h=image.naturalHeight*fit. bounds={left:(1080-w)/2,top:(1080-h)/2,right:(1080+w)/2-1,bottom:(1080+h)/2-1}.
+metadata={};fg=ForegroundEffect.prepare(rasterFrame.data,1080,1080,bounds,metadata).
+adapted=(fg!==rasterFrame.data). Если false — прежний тёмный путь, paper отсутствует. Если true — metadata.background содержит восстановленный фон. paperPixels=копия metadata.background; умножить его RGB на brightness/100, альфу не менять. Кэшировать адаптацию по исходнику/масштабу, paperPixels — ещё по яркости. Не изменять rasterFrame.
+
+2. Action: оригинал и отдельный эталон бумаги
+ActionFrame — копия rasterFrame.data с RGB*brightness/100. НЕ использовать fg вместо исходного цветного фото, не обрезать Action маской объекта. Оба Action-слоя обрабатываются одним и тем же алгоритмом и одинаковыми настройками.
+Для ActionFrame вызови ActionEffect.preparePixels(data,1080,1080,size,contrast/100,1,ActionEffect.gridBlurPlane,'#FFFFFF','#07080B',intensity,trail,image.naturalWidth,image.naturalHeight,clarity), затем ActionAnimation.prepare(new ImageData(data,1080,1080),pixels,contrast).
+Если adapted=true, точно так же подготовь paperGlow из paperPixels, с теми же size/contrast/intensity/trail/clarity и натуральными размерами оригинального image. Кэшировать оба подготовленных glow по одинаковым параметрам, НЕ вычислять их на каждом тике.
+На шаге2 action-animation.js нужен как модуль отрисовки, но time=null и постоянного цикла нет; элементов управления анимацией ещё нет.
+
+3. Отрисовка светлого Action — каждый кадр
+Два отдельных слоя1080 с обычными2D-контекстами. Очистить оба. Вызвать ActionAnimation.draw(subjectContext,subjectGlow,time,intensity,trail) и ActionAnimation.draw(paperContext,paperGlow,time,intensity,trail) с ОДНИМ time: null для статики или одна накопленная фаза в секундах для анимации. Нельзя вычитать статическую бумагу из движущегося эффекта.
+Получить ImageData обоих слоёв. ForegroundEffect.removePaperGlow(subjectFrame.data,paperFrame.data,paperPixels) меняет subjectFrame на месте; формула каждого RGB=clamp(paper+subject-reference,0,255), alpha=255. Положить исправленные пиксели обратно через putImageData. После коррекции применить destination-in с альфой254/255 и вернуть source-over.
+На выходной canvas1080 сначала положить paperPixels, затем исправленный слой. Не класть поверх бумаги applyBase от исходного фото: в актуальном редакторе в светлой ветке эта подложка очищается. Сетка последняя. Маска всего кадра без размытия; не использовать жёсткую маску объекта. Исходные градиенты и оттенки сохраняются, собственный ореол бумаги вычитается.
+Если adapted=false, сохранить прежнюю тёмную композицию: applyBase на копии ActionFrame, эффект поверх с alpha254/255, сетка. В статике допустим прежний preparePixels напрямую; в анимации draw с time. Не вычитать несуществующую бумагу.
+При выключении анимации, reduced-motion или экспорте статики оба слоя должны получить одинаковый null. Скорость влияет на общую фазу обоих слоёв. Экспорт текущего кадра не продвигает фазу между отрисовкой и захватом.
+
+4. Ribbons на светлом фоне
+Если adapted=false: прежний frame после яркости, source=image в renderRibbonStretch.
+Если adapted=true: цветной кадр — копия rasterFrame.data. Вне вписанного прямоугольника x<(1080-w)/2 || x>=(1080+w)/2 || y<(1080-h)/2 || y>=(1080+h)/2 заменить RGBA соответствующим metadata.background. Затем RGB*=brightness/100; для КАЖДОГО пикселя установить alpha=fg[i+3]. Не брать RGB из fg.
+Вызвать RibbonsEffect.renderRibbonStretch(colourFrame,1080,1080,length,capture,bend,'auto',mask1080,null,scale,brightness). При source=null модуль сохраняет прозрачность и не применяет яркость повторно. Его внутренний холст не заливать чёрным. Для тёмного пути source=image, как раньше.
+Композиция: положить paperPixels, поверх прозрачный результат Ribbons, затем сетку. В PNG также сохранить бумагу под прозрачным слоем highResolution — иначе фон станет чёрным/прозрачным. Подготовка маски кисти, экспортная сетка и параметры — по ribbons-contract.txt. Не применять коррекцию removePaperGlow к Ribbons: она предназначена для Action.
+
+5. Проверки
+flowers.png и expected-default.png — тёмный статический Action. light-background.png и expected-light.png — светлый градиент, стандартные настройки, анимация выключена, сетка включена. Эталоны сняты сe8f89db. Проверить белый, серый и пастельный пустой фон со статикой и анимацией: фон не должен приобретать цветные ореолы. Проверить time=null,0,2.5,7 с синхронными слоями и speed25/100/200. Оценивать динамические кадры только при совпадающей фазе.
+При переключении Action/Ribbons общий светлый фон сохраняет оттенок. Проверить яркость, масштаб, новый файл, кисть и PNG1080; сетка и маска кисти не участвуют в расчёте бумаги. Не объявлять независимую сборку и попиксельное совпадение, если проверены только модули.

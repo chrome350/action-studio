@@ -1,0 +1,10 @@
+.grid-line-fields .grid-line-hex,.grid-dimension input{font-size:var(--ds-input-size);font-family:var(--ds-font-number);font-weight:500}
+.grid-line-control>label,aside .compact-control .parameter-label{font-size:var(--ds-label-size);color:var(--ds-text-muted)}
+aside .grid-visibility svg{width:var(--ds-icon-eye-size);height:var(--ds-icon-eye-size)}
+/* Existing selection controls share the field surface and focus treatment. */
+aside .effect-heading #effect-mode,aside .dot-palette-control select,aside .gradient-field{
+ background-color:var(--ds-field);border-radius:var(--ds-radius-control);color:var(--ds-text);
+}
+aside .effect-heading #effect-mode:focus-visible,aside .dot-palette-control select:focus-visible,.gradient-field:focus-visible,.gradient-popup button:focus-visible,.color-picker-popup input:focus-visible{
+ outline:2px solid var(--ds-focus);outline-offset:2px;
+}

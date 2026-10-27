@@ -85,7 +85,7 @@ try{
   assert.equal(prepared.rgba[3],90,'brightness preserves source alpha');
   for(let y=0;y<20;y++)for(let x=0;x<24;x++)assert.equal(prepared.mask[y*24+x],mask[Math.floor(y/2)*12+Math.floor(x/2)],'2x mask sampling is exact');
   const sample=canvases.at(-1);
-  assert.deepEqual(sample.calls,[['fillRect',0,0,24,20],['save'],['translate',12,10],['scale',1.25,1.25],['translate',-12,-10],['drawImage',source,0,4,24,12],['restore']],'ribbon upload sampling uses the original transforms');
+  assert.deepEqual(sample.calls,[['fillRect',0,0,24,20],['save'],['translate',12,10],['scale',1.25,1.25],['translate',-12,-10],['drawImage',source,-8,0,40,20],['restore']],'ribbon upload sampling preserves cover crop and zoom transforms');
   const video=prepareRibbonSource(input,21,17,null,{tagName:'VIDEO',naturalWidth:8,naturalHeight:4},100,100);
   assert.equal(video.width,21);assert.equal(video.height,17,'video keeps its original working resolution');
   assert.equal(video.mask.some(Boolean),false);
